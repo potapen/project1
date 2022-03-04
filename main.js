@@ -11,6 +11,7 @@ for (let i = 0; i < gridWidth * gridHeight; i++) {
     gridElt.appendChild(cell)
     cellsArray.push(cell)
 }
+
 //matrix starts from (1,1)
 //index starts from 0
 function convertCoordinateToIndex(x,y){
@@ -41,7 +42,9 @@ class Trooper{
         this.army = army
         this.name = name
         this.moveRange = 1
+        this.fireRange = 2
         this.reachableCellsArray = []
+        this.fireCellsArray = []
     }
     showOnMap(){
         console.log('show on map')
@@ -66,9 +69,27 @@ class Trooper{
         }
         this.reachableCellsArray = _reachableCellsArray
     }
+
+    computeFireCells(){
+        const _fireCellsArray = []
+        for( let i = this.x - this.fireRange  ; i <= this.x + this.fireRange ; i++){
+            for (let j = this.y - this.fireRange ; j <= this.y + this.fireRange ; j++){
+                const index = convertCoordinateToIndex(i, j)
+                _fireCellsArray.push(cellsArray[index])
+            }
+        }
+        this.fireCellsArray = _fireCellsArray
+    }
+
     showNextMoveCells(){
         this.reachableCellsArray.forEach( cell => {
             cell.classList.add('highlightMove')
+        })
+    }
+
+    showFireCells(){
+        this.fireCellsArray.forEach( cell => {
+            cell.classList.add('highlightFire')
         })
     }
 
@@ -96,11 +117,26 @@ class Trooper{
         //event.target.classList.add(this.name)
     }
 
+    fire = (event)=>{ //I am using an arrow function here so that 'this' can still refers to the trooper object, instead of the cell
+        console.log('fire function')
+        console.log('event.target.id: ', event.target.id)
+        const index = Number(event.target.id) //this is the index of the cell on which we click
+
+        //compute some damage on ennemies
+    }
+
     enableMove () {
         console.log('enableMove function')
         this.reachableCellsArray.forEach( cell => {
-            console.log('cell :', cell)
             cell.addEventListener('click', this.move)
+        })
+    }
+
+    enableFire () {
+        console.log('enableFire function')
+        this.fireCellsArray.forEach( cell => {
+            console.log('cell :', cell)
+            cell.addEventListener('click', this.fire)
         })
     }
 
@@ -111,17 +147,32 @@ class Trooper{
             cell.removeEventListener('click', this.move)
         })
         this.removeNextMoveCells()
+        //this.prepareMove() //for debug, so that we can continuously move
+        this.prepareFire()
     }
 
+    prepareMove(){
+        this.computeNextMoveCells() //to populate blueTrooper.reachableCells
+        this.showNextMoveCells() //to highlight the cells on the grid
+        this.enableMove()
+    }
+
+    prepareFire(){
+        this.computeFireCells()
+        this.showFireCells()
+        this.enableFire()
+    }
 }
 
 
 
 const blueTroopersArray = []
-blueTrooper = new Trooper(2,2,'blue','blueTrooper1')
+blueTrooper = new Trooper(5,5,'blue','blueTrooper1')
+redTrooper = new Trooper(5,7,'red','redTrooper1')
 blueTrooper.showOnMap()
-blueTroopersArray.push(blueTrooper)
-blueTrooper.computeNextMoveCells() //to populate blueTrooper.reachableCells
-blueTrooper.showNextMoveCells() //to highlight the cells on the grid
-console.log('blueTrooper.name: ', blueTrooper.name)
-blueTrooper.enableMove()
+redTrooper.showOnMap()
+// blueTrooper.computeNextMoveCells() //to populate blueTrooper.reachableCells
+// blueTrooper.showNextMoveCells() //to highlight the cells on the grid
+// blueTrooper.enableMove()
+blueTrooper.prepareMove()
+console.log('fin')

@@ -28,6 +28,15 @@ div{
   background-size: contain;
 }
 
+.redTrooper1{
+  background-image: url('./PNG/Hulls_Color_A/Hull_01.png');
+  background-size: contain;
+}
+
 .highlightMove{
   background-color: aqua;
+}
+
+.highlightFire{
+  background-color: rgb(240, 147, 61);
 }
