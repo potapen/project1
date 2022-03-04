@@ -1,0 +1,33 @@
+div{
+    border: black 1px solid;
+}
+
+* {
+    box-sizing: border-box;
+  }
+  
+.grid {
+    display: flex;
+    height: 800px;
+    width: 800px;
+    flex-wrap: wrap;
+    box-sizing: content-box; 
+  }
+
+.cell {
+    border: 1px solid black;
+    width: 80px;
+    height: 80px;
+    /* background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center; */
+}
+
+.blueTrooper1{
+  background-image: url('./PNG/Hulls_Color_D/Hull_01.png');
+  background-size: contain;
+}
+
+.highlightMove{
+  background-color: aqua;
+}
