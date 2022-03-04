@@ -26,6 +26,7 @@ function convertIndexToCoordinate(i){
 function createCell(i) {
     const cell = document.createElement('div')
     cell.classList.add('cell')
+    cell.id = i
     const x = convertIndexToCoordinate(i).x
     const y = convertIndexToCoordinate(i).y
     const iCheck = convertCoordinateToIndex(x,y) //this is to check that all calculations are corrects)
@@ -48,6 +49,13 @@ class Trooper{
         console.log('this.name: ', this.name)
         cellsArray[i].classList.add(this.name)
     }
+
+    removeFromMap(){
+        console.log('remove from map')
+        const i = convertCoordinateToIndex(this.x, this.y)
+        cellsArray[i].classList.remove(this.name)
+    }
+
     computeNextMoveCells(){
         const _reachableCellsArray = []
         for( let i = this.x - this.moveRange  ; i <= this.x + this.moveRange ; i++){
@@ -63,11 +71,29 @@ class Trooper{
             cell.classList.add('highlightMove')
         })
     }
+
+    removeNextMoveCells(){
+        console.log('removeNextMoveCells function')
+        while(this.reachableCellsArray.length > 0){
+            const cell = this.reachableCellsArray.shift() //remove the cell from the this.reachableCellsArray
+            cell.classList.remove('highlightMove') //remove the tag from the cell
+        }
+    }
+
     move = (event)=>{ //I am using an arrow function here so that 'this' can still refers to the trooper object, instead of the cell
         console.log('move function')
-        console.log('event: ', event)
-        console.log('this: ', this)
-        event.target.classList.add(this.name)
+        console.log('event.target.id: ', event.target.id)
+        const index = Number(event.target.id) //this is the index of the cell on which we click
+
+        this.removeFromMap() //we remove the trooper's tag from its current position
+        console.log('this :', this)
+        console.log('this.name :', this.name)
+        const coordinate = convertIndexToCoordinate(index) //we convert index to x,y
+        this.x = coordinate.x //we update the coordinate of the trooper
+        this.y = coordinate.y
+        this.showOnMap() //we show the trooper on the map
+        this.disableMove()//we can now disable movement for this trooper
+        //event.target.classList.add(this.name)
     }
 
     enableMove () {
@@ -76,6 +102,15 @@ class Trooper{
             console.log('cell :', cell)
             cell.addEventListener('click', this.move)
         })
+    }
+
+    disableMove(){
+        console.log('disableMove function')
+        this.reachableCellsArray.forEach( cell => {
+            console.log('cell :', cell)
+            cell.removeEventListener('click', this.move)
+        })
+        this.removeNextMoveCells()
     }
 
 }
