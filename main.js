@@ -36,20 +36,22 @@ function createCell(i) {
 }
 
 class Trooper{
-    constructor(x,y,army,name){
+    constructor(x,y,army,name,moveRange, fireRange, health,strength){
         this.x = x
         this.y = y
         this.army = army
         this.name = name
-        this.moveRange = 1
-        this.fireRange = 2
+        this.moveRange = moveRange
+        this.fireRange = fireRange
+        this.health = health
+        this.strength = strength
         this.reachableCellsArray = []
         this.fireCellsArray = []
     }
     showOnMap(){
         console.log('show on map')
         const i = convertCoordinateToIndex(this.x, this.y)
-        console.log('this.name: ', this.name)
+        // console.log('this.name: ', this.name)
         cellsArray[i].classList.add(this.name)
     }
 
@@ -81,6 +83,40 @@ class Trooper{
         this.fireCellsArray = _fireCellsArray
     }
 
+    checkWhoIsInThisCell(index){
+        const x = convertIndexToCoordinate(index).x
+        const y = convertIndexToCoordinate(index).y
+        let presentTrooper
+        for (let trooper of game.blueTroopersArray){
+            if(trooper.x === x && trooper.y === y){
+                presentTrooper = trooper
+            }
+        }
+        for (let trooper of game.redTroopersArray){
+            if(trooper.x === x && trooper.y === y){
+                presentTrooper = trooper
+            }
+        }
+        return presentTrooper
+
+    }
+    
+    removeNextMoveCells(){
+        console.log('removeNextMoveCells function')
+        while(this.reachableCellsArray.length > 0){
+            const cell = this.reachableCellsArray.shift() //remove the cell from the this.reachableCellsArray
+            cell.classList.remove('highlightMove') //remove the tag from the cell
+        }
+    }
+
+    removeNextFireCells(){
+        console.log('removeNextFireCells function')
+        while(this.fireCellsArray.length > 0){
+            const cell = this.fireCellsArray.shift() //remove the cell from the this.reachableCellsArray
+            cell.classList.remove('highlightFire') //remove the tag from the cell
+        }
+    }
+
     showNextMoveCells(){
         this.reachableCellsArray.forEach( cell => {
             cell.classList.add('highlightMove')
@@ -93,74 +129,33 @@ class Trooper{
         })
     }
 
-    removeNextMoveCells(){
-        console.log('removeNextMoveCells function')
-        while(this.reachableCellsArray.length > 0){
-            const cell = this.reachableCellsArray.shift() //remove the cell from the this.reachableCellsArray
-            cell.classList.remove('highlightMove') //remove the tag from the cell
-        }
-    }
-
-    move = (event)=>{ //I am using an arrow function here so that 'this' can still refers to the trooper object, instead of the cell
+    move = (index)=>{ //I am using an arrow function here so that 'this' can still refers to the trooper object, instead of the cell
         console.log('move function')
-        console.log('event.target.id: ', event.target.id)
-        const index = Number(event.target.id) //this is the index of the cell on which we click
-
         this.removeFromMap() //we remove the trooper's tag from its current position
-        console.log('this :', this)
-        console.log('this.name :', this.name)
+        // console.log('this.name :', this.name)
         const coordinate = convertIndexToCoordinate(index) //we convert index to x,y
         this.x = coordinate.x //we update the coordinate of the trooper
         this.y = coordinate.y
         this.showOnMap() //we show the trooper on the map
-        this.disableMove()//we can now disable movement for this trooper
-        //event.target.classList.add(this.name)
+
     }
 
-    fire = (event)=>{ //I am using an arrow function here so that 'this' can still refers to the trooper object, instead of the cell
+    fire = (index)=>{ //I am using an arrow function here so that 'this' can still refers to the trooper object, instead of the cell
         console.log('fire function')
-        console.log('event.target.id: ', event.target.id)
-        const index = Number(event.target.id) //this is the index of the cell on which we click
-
+        console.log('this: ', this)
+        const target = this.checkWhoIsInThisCell(index)
+        if (target){
+            console.log('target :', target)
+            console.log(`this.strength: ${this.strength}, typeof this.strength: ${typeof this.strength}`)
+            target.takeDamage(this.strength)
+        }
         //compute some damage on ennemies
     }
 
-    enableMove () {
-        console.log('enableMove function')
-        this.reachableCellsArray.forEach( cell => {
-            cell.addEventListener('click', this.move)
-        })
-    }
-
-    enableFire () {
-        console.log('enableFire function')
-        this.fireCellsArray.forEach( cell => {
-            console.log('cell :', cell)
-            cell.addEventListener('click', this.fire)
-        })
-    }
-
-    disableMove(){
-        console.log('disableMove function')
-        this.reachableCellsArray.forEach( cell => {
-            console.log('cell :', cell)
-            cell.removeEventListener('click', this.move)
-        })
-        this.removeNextMoveCells()
-        //this.prepareMove() //for debug, so that we can continuously move
-        this.prepareFire()
-    }
-
-    prepareMove(){
-        this.computeNextMoveCells() //to populate blueTrooper.reachableCells
-        this.showNextMoveCells() //to highlight the cells on the grid
-        this.enableMove()
-    }
-
-    prepareFire(){
-        this.computeFireCells()
-        this.showFireCells()
-        this.enableFire()
+    takeDamage(damage){
+        console.log(`this.health: ${this.health} typeof this.health: ${typeof this.health}`)
+        console.log(`damage: ${damage} typeof damage: ${typeof damage}`)
+        this.health -= damage
     }
 }
 
@@ -168,18 +163,56 @@ class Trooper{
 const game = {
     blueTroopersArray : [],
     redTroopersArray :  [],
+    currentPlayer : '',
+    currentPhase : '',
     initGame(){
-        blueTrooper = new Trooper(5,5,'blue','blueTrooper1')
-        redTrooper = new Trooper(5,7,'red','redTrooper1')
+        blueTrooper = new Trooper(5,5,'blue','blueTrooper1',1,2,100,20)
+        this.blueTroopersArray.push(blueTrooper)
+        redTrooper = new Trooper(5,7,'red','redTrooper1',1,2,110,15)
+        this.redTroopersArray.push(redTrooper)
+        this.currentPlayer = 'blue'
+        this.currentPhase = 'selectMovable'
         blueTrooper.showOnMap()
         redTrooper.showOnMap()
+        this.selectedUnit = this.blueTroopersArray[0]
+        console.log(this.selectedUnit)
+        this.selectedUnit.computeNextMoveCells()
+        this.selectedUnit.showNextMoveCells()
+        console.log('initGame this: ', this)
+        document.addEventListener('click', this.handleClick.bind(this))
+    },
+    handleClick(event){
+        const index = Number(event.target.id) //this is the index of the cell on which we click
+        console.log(index)
+        console.log('this: ', this)
+        console.log('this.selectedUnit: ', this.selectedUnit)
+        const currentUnit = game.selectedUnit 
+        switch(game.currentPhase){
+            case 'selectMovable':
+                currentUnit.computeNextMoveCells()
+                currentUnit.showNextMoveCells()
+                game.currentPhase = 'move'
+            case 'move':
+                currentUnit.removeNextMoveCells()
+                currentUnit.move(index)
+                currentUnit.computeFireCells()
+                currentUnit.showFireCells()
+                game.currentPhase = 'fire'
+                break
+            case 'fire':
+                currentUnit.fire(index)
+                currentUnit.removeNextFireCells()
+                break
+        }
     },
     playOneRound(){
-        blueTrooper.prepareMove()
+        
     }
 }
 
 game.initGame()
+console.log('game.currentPhase: ', game.currentPhase)
+
 game.playOneRound()
 
 console.log('fin')
