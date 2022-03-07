@@ -62,25 +62,25 @@ class Trooper{
     }
 
     computeNextMoveCells(){
-        const _reachableCellsArray = []
+        const reachableCellsArray = []
         for( let i = this.x - this.moveRange  ; i <= this.x + this.moveRange ; i++){
             for (let j = this.y - this.moveRange ; j <= this.y + this.moveRange ; j++){
                 const index = convertCoordinateToIndex(i, j)
-                _reachableCellsArray.push(cellsArray[index])
+                if(index >=0 && index < cellsArray.length){reachableCellsArray.push(cellsArray[index])}
             }
         }
-        this.reachableCellsArray = _reachableCellsArray
+        this.reachableCellsArray = reachableCellsArray
     }
 
     computeFireCells(){
-        const _fireCellsArray = []
+        const fireCellsArray = []
         for( let i = this.x - this.fireRange  ; i <= this.x + this.fireRange ; i++){
             for (let j = this.y - this.fireRange ; j <= this.y + this.fireRange ; j++){
                 const index = convertCoordinateToIndex(i, j)
-                _fireCellsArray.push(cellsArray[index])
+                if(index >=0 && index < cellsArray.length){fireCellsArray.push(cellsArray[index])}
             }
         }
-        this.fireCellsArray = _fireCellsArray
+        this.fireCellsArray = fireCellsArray
     }
 
     checkWhoIsInThisCell(index){
@@ -142,19 +142,14 @@ class Trooper{
 
     fire = (index)=>{ //I am using an arrow function here so that 'this' can still refers to the trooper object, instead of the cell
         console.log('fire function')
-        console.log('this: ', this)
         const target = this.checkWhoIsInThisCell(index)
         if (target){
-            console.log('target :', target)
-            console.log(`this.strength: ${this.strength}, typeof this.strength: ${typeof this.strength}`)
             target.takeDamage(this.strength)
         }
         //compute some damage on ennemies
     }
 
     takeDamage(damage){
-        console.log(`this.health: ${this.health} typeof this.health: ${typeof this.health}`)
-        console.log(`damage: ${damage} typeof damage: ${typeof damage}`)
         this.health -= damage
     }
 }
@@ -180,8 +175,8 @@ const game = {
         this.armies['blue'] = this.blueTroopersArray
         this.armies['red'] = this.redTroopersArray
 
-        this.lastTrooperIndexesPerArmy['blue'] = 0
-        this.lastTrooperIndexesPerArmy['red'] = -1
+        this.lastTrooperIndexesPerArmy['blue'] = 0 //0 for the initial army
+        this.lastTrooperIndexesPerArmy['red'] = -1 //-1 for all other armies
 
         
         this.currentArmy = 'blue'
@@ -214,33 +209,32 @@ const game = {
         this.selectedUnit.showNextMoveCells()
     },
     handleClick(event){
-        const index = Number(event.target.id) //this is the index of the cell on which we click
-        console.log(index)
-        console.log('this: ', this)
-        console.log('this.selectedUnit: ', this.selectedUnit)
-
-        switch(game.currentPhase){
-            case 'selectMovable':
-                console.log('switch case selectMovable')
-                this.selectedUnit.computeNextMoveCells()
-                this.selectedUnit.showNextMoveCells()
-                game.currentPhase = 'move'
-            case 'move':
-                console.log('switch case move')
-                this.selectedUnit.removeNextMoveCells()
-                this.selectedUnit.move(index)
-                this.selectedUnit.computeFireCells()
-                this.selectedUnit.showFireCells()
-                game.currentPhase = 'fire'
-                break
-            case 'fire':
-                console.log('switch case fire')
-                this.selectedUnit.fire(index)
-                this.selectedUnit.removeNextFireCells()
-                this.selectNextUnit()
-                this.currentPhase = 'selectMovable'
-                break
+        if(event.target.classList.contains('cell')){ //we click on a cell of the grid
+            const index = Number(event.target.id) //this is the index of the cell on which we click
+            switch(game.currentPhase){
+                case 'selectMovable':
+                    console.log('switch case selectMovable')
+                    this.selectedUnit.computeNextMoveCells()
+                    this.selectedUnit.showNextMoveCells()
+                    game.currentPhase = 'move'
+                case 'move':
+                    console.log('switch case move')
+                    this.selectedUnit.removeNextMoveCells()
+                    this.selectedUnit.move(index)
+                    this.selectedUnit.computeFireCells()
+                    this.selectedUnit.showFireCells()
+                    game.currentPhase = 'fire'
+                    break
+                case 'fire':
+                    console.log('switch case fire')
+                    this.selectedUnit.fire(index)
+                    this.selectedUnit.removeNextFireCells()
+                    this.selectNextUnit()
+                    this.currentPhase = 'selectMovable'
+                    break
+            }
         }
+        else{console.log('handleClick event: ',event)}
     }
 }
 
