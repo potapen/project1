@@ -163,14 +163,19 @@ class Trooper{
 const game = {
     blueTroopersArray : [],
     redTroopersArray :  [],
-    currentPlayer : '',
+    armies : {},
+    selectedUnit : {},
+    currentArmy : '',
     currentPhase : '',
     initGame(){
-        blueTrooper = new Trooper(5,5,'blue','blueTrooper1',1,2,100,20)
+        const blueTrooper = new Trooper(5,5,'blue','blueTrooper1',1,2,100,20)
         this.blueTroopersArray.push(blueTrooper)
-        redTrooper = new Trooper(5,7,'red','redTrooper1',1,2,110,15)
+        const redTrooper = new Trooper(5,7,'red','redTrooper1',1,2,110,15)
         this.redTroopersArray.push(redTrooper)
-        this.currentPlayer = 'blue'
+        this.armies['blue'] = this.blueTroopersArray
+        this.armies['red'] = this.redTroopersArray
+        
+        this.currentArmy = 'blue'
         this.currentPhase = 'selectMovable'
         blueTrooper.showOnMap()
         redTrooper.showOnMap()
@@ -179,40 +184,48 @@ const game = {
         this.selectedUnit.computeNextMoveCells()
         this.selectedUnit.showNextMoveCells()
         console.log('initGame this: ', this)
-        document.addEventListener('click', this.handleClick.bind(this))
+        //document.addEventListener('click', this.handleClick.bind(this)) 
+    },
+    selectNextUnit(){
+        this.currentArmy = this.currentArmy === 'blue' ? 'red' : 'blue'
+        console.log('this.currentArmy: ', this.currentArmy)
+        this.selectedUnit = this.armies[this.currentArmy][0]
+        console.log('this.selectedUnit: ', this.selectedUnit)
+        this.selectedUnit.computeNextMoveCells()
+        this.selectedUnit.showNextMoveCells()
     },
     handleClick(event){
         const index = Number(event.target.id) //this is the index of the cell on which we click
         console.log(index)
         console.log('this: ', this)
         console.log('this.selectedUnit: ', this.selectedUnit)
-        const currentUnit = game.selectedUnit 
+
         switch(game.currentPhase){
             case 'selectMovable':
-                currentUnit.computeNextMoveCells()
-                currentUnit.showNextMoveCells()
+                console.log('switch case selectMovable')
+                this.selectedUnit.computeNextMoveCells()
+                this.selectedUnit.showNextMoveCells()
                 game.currentPhase = 'move'
             case 'move':
-                currentUnit.removeNextMoveCells()
-                currentUnit.move(index)
-                currentUnit.computeFireCells()
-                currentUnit.showFireCells()
+                console.log('switch case move')
+                this.selectedUnit.removeNextMoveCells()
+                this.selectedUnit.move(index)
+                this.selectedUnit.computeFireCells()
+                this.selectedUnit.showFireCells()
                 game.currentPhase = 'fire'
                 break
             case 'fire':
-                currentUnit.fire(index)
-                currentUnit.removeNextFireCells()
+                console.log('switch case fire')
+                this.selectedUnit.fire(index)
+                this.selectedUnit.removeNextFireCells()
+                this.selectNextUnit()
+                this.currentPhase = 'selectMovable'
                 break
         }
-    },
-    playOneRound(){
-        
     }
 }
 
 game.initGame()
-console.log('game.currentPhase: ', game.currentPhase)
-
-game.playOneRound()
+document.addEventListener('click', game.handleClick.bind(game)) 
 
 console.log('fin')
