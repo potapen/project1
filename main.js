@@ -165,14 +165,21 @@ class Trooper{
 }
 
 
+const game = {
+    blueTroopersArray : [],
+    redTroopersArray :  [],
+    initGame(){
+        blueTrooper = new Trooper(5,5,'blue','blueTrooper1')
+        redTrooper = new Trooper(5,7,'red','redTrooper1')
+        blueTrooper.showOnMap()
+        redTrooper.showOnMap()
+    },
+    playOneRound(){
+        blueTrooper.prepareMove()
+    }
+}
 
-const blueTroopersArray = []
-blueTrooper = new Trooper(5,5,'blue','blueTrooper1')
-redTrooper = new Trooper(5,7,'red','redTrooper1')
-blueTrooper.showOnMap()
-redTrooper.showOnMap()
-// blueTrooper.computeNextMoveCells() //to populate blueTrooper.reachableCells
-// blueTrooper.showNextMoveCells() //to highlight the cells on the grid
-// blueTrooper.enableMove()
-blueTrooper.prepareMove()
+game.initGame()
+game.playOneRound()
+
 console.log('fin')
