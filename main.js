@@ -25,6 +25,8 @@ function convertIndexToCoordinate(i){
     return {x:x,y:y}
 }
 function createCell(i) {
+    const containerCell = document.createElement('div')
+    containerCell.classList.add('container')
     const cell = document.createElement('div')
     cell.classList.add('cell')
     cell.id = i
@@ -32,7 +34,8 @@ function createCell(i) {
     const y = convertIndexToCoordinate(i).y
     const iCheck = convertCoordinateToIndex(x,y) //this is to check that all calculations are corrects)
     cell.innerText = `${i} (${x}:${y})`
-    return cell
+    containerCell.appendChild(cell)
+    return containerCell
 }
 
 class Trooper{
@@ -146,6 +149,8 @@ class Trooper{
         if (target){
             target.takeDamage(this.strength)
         }
+        console.log(' cellsArray[index].childNodes[0]: ', cellsArray[index].childNodes[0])
+        cellsArray[index].childNodes[0].classList.add('explosion')
         //compute some damage on ennemies
     }
 
