@@ -163,22 +163,31 @@ class Trooper{
 const game = {
     blueTroopersArray : [],
     redTroopersArray :  [],
-    armies : {},
-    selectedUnit : {},
-    currentArmy : '',
-    currentPhase : '',
+    armies : {}, //{blue: blueTroopersArray, red: redTroopersArray}
+    lastTrooperIndexesPerArmy: {}, //{blue: 0, red: 1}
+    selectedUnit : {}, //a trooper, whatever the army
+    currentArmy : '', //blue or red
+    currentPhase : '', //move or fire
     initGame(){
-        const blueTrooper = new Trooper(5,5,'blue','blueTrooper1',1,2,100,20)
-        this.blueTroopersArray.push(blueTrooper)
-        const redTrooper = new Trooper(5,7,'red','redTrooper1',1,2,110,15)
-        this.redTroopersArray.push(redTrooper)
+        const blueTrooper1 = new Trooper(3,5,'blue','blueTrooper1',1,2,100,20)
+        const blueTrooper2 = new Trooper(5,5,'blue','blueTrooper2',1,2,100,20)
+        this.blueTroopersArray.push(blueTrooper1)
+        this.blueTroopersArray.push(blueTrooper2)
+        const redTrooper1 = new Trooper(3,7,'red','redTrooper1',1,2,110,15)
+        const redTrooper2 = new Trooper(5,7,'red','redTrooper2',1,2,110,15)
+        this.redTroopersArray.push(redTrooper1)
+        this.redTroopersArray.push(redTrooper2)
         this.armies['blue'] = this.blueTroopersArray
         this.armies['red'] = this.redTroopersArray
+
+        this.lastTrooperIndexesPerArmy['blue'] = 0
+        this.lastTrooperIndexesPerArmy['red'] = -1
+
         
         this.currentArmy = 'blue'
         this.currentPhase = 'selectMovable'
-        blueTrooper.showOnMap()
-        redTrooper.showOnMap()
+        const allTroopersArray = this.blueTroopersArray.concat(this.redTroopersArray)
+        allTroopersArray.forEach( trooper => trooper.showOnMap())
         this.selectedUnit = this.blueTroopersArray[0]
         console.log(this.selectedUnit)
         this.selectedUnit.computeNextMoveCells()
@@ -188,8 +197,18 @@ const game = {
     },
     selectNextUnit(){
         this.currentArmy = this.currentArmy === 'blue' ? 'red' : 'blue'
-        console.log('this.currentArmy: ', this.currentArmy)
-        this.selectedUnit = this.armies[this.currentArmy][0]
+        console.log('selectNextUnit this.currentArmy: ', this.currentArmy)
+        /*
+        selectionner le prochain trooper
+        index+1 % length
+        passer au suivant s'il le next trooper est mort
+        */
+        const lastIndex = this.lastTrooperIndexesPerArmy[this.currentArmy] //index of last trooper for a given army, ex: this.currentArmy = blue
+        console.log('selectNextUnit lastIndex: ', lastIndex)
+        const armySize = this.armies[this.currentArmy].length //size of army,ex: this.currentArmy = blue
+        const nextIndex = (lastIndex + 1) % armySize
+        this.lastTrooperIndexesPerArmy[this.currentArmy] = nextIndex
+        this.selectedUnit = this.armies[this.currentArmy][nextIndex%armySize]
         console.log('this.selectedUnit: ', this.selectedUnit)
         this.selectedUnit.computeNextMoveCells()
         this.selectedUnit.showNextMoveCells()

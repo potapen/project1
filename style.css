@@ -28,8 +28,18 @@ div{
   background-size: contain;
 }
 
+.blueTrooper2{
+  background-image: url('./PNG/Hulls_Color_D/Hull_02.png');
+  background-size: contain;
+}
+
 .redTrooper1{
   background-image: url('./PNG/Hulls_Color_A/Hull_01.png');
+  background-size: contain;
+}
+
+.redTrooper2{
+  background-image: url('./PNG/Hulls_Color_A/Hull_02.png');
   background-size: contain;
 }
 
