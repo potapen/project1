@@ -62,14 +62,11 @@ div{
   background-image: var(--tankImageUrl);
 }
 
-.cellTurret{
-  background-image: var(--turretImageUrl);
-  --turretAngle : 45deg;
-  transform: rotate(var(--turretAngle));
-}
+
 .blueTrooper1{
   --tankImageUrl : url(./901177/Hulls_Color_D/Hull_01.png);
   --turretImageUrl : url(./901177/Weapon_Color_D_256X256/Gun_01.png);
+  transform: rotate(90deg);
   background-size: contain;
 }
 
@@ -77,21 +74,27 @@ div{
 .blueTrooper2{
   --tankImageUrl : url(./901177/Hulls_Color_D/Hull_02.png);
   --turretImageUrl : url(./901177/Weapon_Color_D_256X256/Gun_02.png);
+  transform: rotate(90deg);
   background-size: contain;
 }
 
 .redTrooper1{
   --tankImageUrl : url(./901177/Hulls_Color_A/Hull_01.png);
   --turretImageUrl : url(./901177/Weapon_Color_A_256X256/Gun_01.png);
+  transform: rotate(270deg);
   background-size: contain;
 }
 
 .redTrooper2{
   --tankImageUrl : url(./901177/Hulls_Color_A/Hull_02.png);
   --turretImageUrl : url(./901177/Weapon_Color_A_256X256/Gun_02.png);
+  transform: rotate(270deg);
   background-size: contain;
 }
-
+.cellTurret{
+  background-image: var(--turretImageUrl);
+  transform: rotate(var(--turretAngle));
+}
 .highlightMove{
   background-color: aqua;
 }
