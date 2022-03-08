@@ -1,6 +1,7 @@
 //populating the grid to display all units
 const gridElt = document.querySelector('.grid')
 const attackerPanelElt = document.querySelector('.attackerPanel')
+const targetPanelElt = document.querySelector('.targetPanel')
 
 const gridWidth = 10
 const gridHeight = 10
@@ -276,7 +277,7 @@ const game = {
         console.log('selectNextUnit this.currentArmy: ', this.currentArmy)
         /*
         selectionner le prochain trooper
-        index+1 % length
+        index+1 % lengths
         passer au suivant s'il le next trooper est mort
         */
         const lastIndex = this.lastTrooperIndexesPerArmy[this.currentArmy] //index of last trooper for a given army, ex: this.currentArmy = blue
@@ -334,17 +335,26 @@ document.addEventListener('click', game.handleClick.bind(game))
 gridElt.addEventListener("mousemove", e => {
     const offsetX = 0
     const offsetY = 80
-
+    // console.log('addEventListener("mousemove") event', event)
     const selectedUnit = game.selectedUnit
-    console.log(selectedUnit)
     const X = cellWidth/2 + (selectedUnit.y -1)*cellWidth + offsetX
     const Y = cellHeight/2 + (selectedUnit.x -1)*cellHeight + offsetY
-    console.log(e.clientX,e.clientY,X,Y)
     const angle = computeAngle(X,Y,e.clientX,e.clientY)
 
     const index = selectedUnit.getIndex()
     const container = cellsArray[index]
     const turretElt = container.querySelector('.cellTurret')
-    turretElt.style.setProperty('--turretAngle', angle + "deg");
+    turretElt.style.setProperty('--turretAngle', angle + "deg")
+    targetPanelElt.querySelector('.coordinate').innerText = `${e.clientX}:${e.clientY}`
+
+    const target = event.target
+    const parentNode = target.parentNode
+    const cellTank = parentNode.querySelector('.cellTank')
+    const classArray = cellTank.classList
+    if(classArray.length>1){
+        console.log('classArray:', classArray)
+    }
+
+
 });
 console.log('fin')
