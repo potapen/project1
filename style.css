@@ -63,7 +63,8 @@ div{
 }
 
 
-div .blueTrooper1{
+
+.blueTrooper1{
   --tankImageUrl : url(./901177/Hulls_Color_D/Hull_01.png);
   --turretImageUrl : url(./901177/Weapon_Color_D_256X256/Gun_01.png);
   transform: rotate(90deg);
@@ -73,10 +74,11 @@ div .blueTrooper1{
 }
 
 .hiding{
-  /* display:none; */
+  /* display:none; this does not work*/
   background: none;
 }
-div .blueTrooper1.hiding{
+
+.blueTrooper1.hiding{
   left: -100px;
 
 }
