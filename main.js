@@ -238,16 +238,26 @@ const game = {
     },
     animationInitialDeployment(){
         console.log('animationInitialDeployment function')
-        this.blueTroopersArray.forEach( trooper =>{
-            const index = convertCoordinateToIndex(trooper.x, trooper.y)
-            const container = cellsArray[index]
-            const cellTank = container.querySelector('.cellTank')
-            cellTank.classList.add('hiding')
-            setTimeout(() => {
-                cellTank.classList.remove('hiding')
-            }
-                , 1000)
-
+        const armiesArray = Object.keys(this.armies) //Array [ "blue", "red" ]
+        console.log('armiesArray: ', armiesArray)
+        armiesArray.forEach( army => {
+            troopersArray = this.armies[army]
+            console.log('troopersArray: ', troopersArray)
+            troopersArray.forEach( trooper =>{
+                const index = convertCoordinateToIndex(trooper.x, trooper.y)
+                const container = cellsArray[index]
+                const cellTank = container.querySelector('.cellTank')
+                const cellTurret = container.querySelector('.cellTurret')
+                cellTank.classList.add('hiding')
+                cellTurret.classList.add('hiding')
+                setTimeout(() => {
+                    cellTank.classList.remove('hiding')
+                    cellTurret.classList.remove('hiding')
+    
+                }
+                    , 1000)
+    
+            })
         })
     },
     selectNextUnit(){
