@@ -78,6 +78,8 @@ class Trooper{
         // console.log('this.name: ', this.name)
         cellsArray[i].querySelector('.cellTank').classList.add(this.name)
         cellsArray[i].querySelector('.cellTurret').classList.add(this.name)
+        cellsArray[i].querySelector('.cellTank').classList.add(this.army)
+        cellsArray[i].querySelector('.cellTurret').classList.add(this.army)
     }
 
     removeFromMap(){
@@ -85,6 +87,8 @@ class Trooper{
         const i = convertCoordinateToIndex(this.x, this.y)
         cellsArray[i].querySelector('.cellTank').classList.remove(this.name)
         cellsArray[i].querySelector('.cellTurret').classList.remove(this.name)
+        cellsArray[i].querySelector('.cellTank').classList.remove(this.army)
+        cellsArray[i].querySelector('.cellTurret').classList.remove(this.army)
     }
 
     computeNextMoveCells(){
@@ -188,7 +192,6 @@ class Trooper{
         cellEffectElt.classList.add('explosion')
         setTimeout(() => {
             cellEffectElt.remove('explosion')
-            console.log('timeoutexpire')
         }
             , 1000)
         
@@ -227,11 +230,25 @@ const game = {
         const allTroopersArray = this.blueTroopersArray.concat(this.redTroopersArray)
         allTroopersArray.forEach( trooper => trooper.showOnMap())
         this.selectedUnit = this.blueTroopersArray[0]
-        console.log(this.selectedUnit)
+
         this.selectedUnit.computeNextMoveCells()
         this.selectedUnit.showNextMoveCells()
-        console.log('initGame this: ', this)
-        //document.addEventListener('click', this.handleClick.bind(this)) 
+        this.animationInitialDeployment()
+        
+    },
+    animationInitialDeployment(){
+        console.log('animationInitialDeployment function')
+        this.blueTroopersArray.forEach( trooper =>{
+            const index = convertCoordinateToIndex(trooper.x, trooper.y)
+            const container = cellsArray[index]
+            const cellTank = container.querySelector('.cellTank')
+            cellTank.classList.add('hiding')
+            setTimeout(() => {
+                cellTank.classList.remove('hiding')
+            }
+                , 1000)
+
+        })
     },
     selectNextUnit(){
         this.currentArmy = this.currentArmy === 'blue' ? 'red' : 'blue'
