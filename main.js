@@ -27,12 +27,12 @@ function convertIndexToCoordinate(i){
 function createContainerCell(i) {
     const containerCell = createCell('div','container',gridElt)
 
-
-    createCell('div','cellHighlight',containerCell)
-    createCell('div','cellEffect',containerCell)
-    createCell('div','cellTurret',containerCell)
-    createCell('div','cellTank',containerCell)
+    
     createCell('div','cellTile',containerCell)
+    createCell('div','cellHighlight',containerCell)
+    createCell('div','cellTank',containerCell)
+    createCell('div','cellTurret',containerCell)
+    createCell('div','cellEffect',containerCell)
     const cell = createCell('div','cell',containerCell)
     cell.id = i
     const x = convertIndexToCoordinate(i).x
@@ -75,13 +75,13 @@ class Trooper{
         console.log('show on map')
         const i = convertCoordinateToIndex(this.x, this.y)
         // console.log('this.name: ', this.name)
-        cellsArray[i].classList.add(this.name)
+        cellsArray[i].querySelector('.cellTank').classList.add(this.name)
     }
 
     removeFromMap(){
         console.log('remove from map')
         const i = convertCoordinateToIndex(this.x, this.y)
-        cellsArray[i].classList.remove(this.name)
+        cellsArray[i].querySelector('.cellTank').classList.remove(this.name)
     }
 
     computeNextMoveCells(){
@@ -128,7 +128,8 @@ class Trooper{
         console.log('removeNextMoveCells function')
         while(this.reachableCellsArray.length > 0){
             const cell = this.reachableCellsArray.shift() //remove the cell from the this.reachableCellsArray
-            cell.classList.remove('highlightMove') //remove the tag from the cell
+            const cellHighlightElt = cell.querySelector('.cellHighlight')
+            cellHighlightElt.classList.remove('highlightMove') //remove the tag from the cell
         }
     }
 
@@ -142,7 +143,8 @@ class Trooper{
 
     showNextMoveCells(){
         this.reachableCellsArray.forEach( cell => {
-            cell.classList.add('highlightMove')
+            const cellHighlightElt = cell.querySelector('.cellHighlight')
+            cellHighlightElt.classList.add('highlightMove')
         })
     }
 
