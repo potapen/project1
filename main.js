@@ -76,12 +76,14 @@ class Trooper{
         const i = convertCoordinateToIndex(this.x, this.y)
         // console.log('this.name: ', this.name)
         cellsArray[i].querySelector('.cellTank').classList.add(this.name)
+        cellsArray[i].querySelector('.cellTurret').classList.add(this.name)
     }
 
     removeFromMap(){
         console.log('remove from map')
         const i = convertCoordinateToIndex(this.x, this.y)
         cellsArray[i].querySelector('.cellTank').classList.remove(this.name)
+        cellsArray[i].querySelector('.cellTurret').classList.remove(this.name)
     }
 
     computeNextMoveCells(){
@@ -181,12 +183,13 @@ class Trooper{
 
     addExplosionEffect(index){
         console.log('addExplosionEffect function')
-        cellsArray[index].querySelector('.cellEffect').classList.add('explosion')
-        // setTimeout(() => {
-        //     cellsArray[index].childNodes[0].classList.remove('explosion')
-        //     console.log('timeoutexpire')
-        // }
-        //     , 1000)
+        const cellEffectElt = cellsArray[index].querySelector('.cellEffect') 
+        cellEffectElt.classList.add('explosion')
+        setTimeout(() => {
+            cellEffectElt.remove('explosion')
+            console.log('timeoutexpire')
+        }
+            , 1000)
         
     }
 
