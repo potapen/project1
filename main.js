@@ -1,5 +1,6 @@
 //populating the grid to display all units
 const gridElt = document.querySelector('.grid')
+const attackerPanelElt = document.querySelector('.attackerPanel')
 
 const gridWidth = 10
 const gridHeight = 10
@@ -7,9 +8,8 @@ const cellsArray = []
 
 
 for (let i = 0; i < gridWidth * gridHeight; i++) {
-    const cell = createCell(i)
-    gridElt.appendChild(cell)
-    cellsArray.push(cell)
+    const containerCell = createContainerCell(i)
+    cellsArray.push(containerCell)
 }
 
 //matrix starts from (1,1)
@@ -24,19 +24,39 @@ function convertIndexToCoordinate(i){
     const y = 1 + i%gridWidth
     return {x:x,y:y}
 }
-function createCell(i) {
-    const containerCell = document.createElement('div')
-    containerCell.classList.add('container')
-    const cell = document.createElement('div')
-    cell.classList.add('cell')
+function createContainerCell(i) {
+    const containerCell = createCell('div','container',gridElt)
+
+
+    createCell('div','cellHighlight',containerCell)
+    createCell('div','cellEffect',containerCell)
+    createCell('div','cellTurret',containerCell)
+    createCell('div','cellTank',containerCell)
+    createCell('div','cellTile',containerCell)
+    const cell = createCell('div','cell',containerCell)
     cell.id = i
     const x = convertIndexToCoordinate(i).x
     const y = convertIndexToCoordinate(i).y
-    const iCheck = convertCoordinateToIndex(x,y) //this is to check that all calculations are corrects)
     cell.innerText = `${i} (${x}:${y})`
-    containerCell.appendChild(cell)
+
     return containerCell
 }
+
+function createCell(cellType='div', cellClass,eltToAppendTo){
+    const cell = document.createElement(cellType)
+    cell.classList.add(cellClass)
+    eltToAppendTo.appendChild(cell)
+    return cell
+}
+/*
+        <div class="container">
+          <div class="cellTile tile"></div>
+          <div class="cellHighlight"></div>
+          <div class="cellTank blueTrooper1"></div>
+          <div class="cellTurret"></div>
+          <div class="cellEffect explosion"></div>
+        </div>
+*/
 
 class Trooper{
     constructor(x,y,army,name,moveRange, fireRange, health,strength){
@@ -149,17 +169,29 @@ class Trooper{
         if (target){
             target.takeDamage(this.strength)
         }
-        console.log(' cellsArray[index].childNodes[0]: ', cellsArray[index].childNodes[0])
-        cellsArray[index].childNodes[0].classList.add('explosion')
+        this.addExplosionEffect(index)
         //compute some damage on ennemies
     }
 
     takeDamage(damage){
         this.health -= damage
     }
+
+    addExplosionEffect(index){
+        console.log('addExplosionEffect function')
+        cellsArray[index].querySelector('.cellEffect').classList.add('explosion')
+        // setTimeout(() => {
+        //     cellsArray[index].childNodes[0].classList.remove('explosion')
+        //     console.log('timeoutexpire')
+        // }
+        //     , 1000)
+        
+    }
+
+    displayInfoPanel(){
+        attackerPanelElt.innerText = this.health
+    }
 }
-
-
 const game = {
     blueTroopersArray : [],
     redTroopersArray :  [],
@@ -212,8 +244,10 @@ const game = {
         console.log('this.selectedUnit: ', this.selectedUnit)
         this.selectedUnit.computeNextMoveCells()
         this.selectedUnit.showNextMoveCells()
+        this.selectedUnit.displayInfoPanel()
     },
     handleClick(event){
+        console.log('handleClick event: ',event)
         if(event.target.classList.contains('cell')){ //we click on a cell of the grid
             const index = Number(event.target.id) //this is the index of the cell on which we click
             switch(game.currentPhase){
@@ -239,7 +273,7 @@ const game = {
                     break
             }
         }
-        else{console.log('handleClick event: ',event)}
+
     }
 }
 

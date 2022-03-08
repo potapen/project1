@@ -17,97 +17,65 @@ div{
   }
 
 .container{
+  position: relative;
   border: 1px solid black;
   width: 80px;
   height: 80px;
-  --image: url();
-
 }
 
-/* .containerBlueTrooper1{
-  --trooperImage : url('./PNG/Hulls_Color_D/Hull_01.png');
-} */
-
-
-.cell{
+.container > div{
+  position: absolute;
+  top: 0px;
+  left: 0px;
   border: 1px solid red;
   width: 100%;
   height: 100%;
-  background-image: var(--image);
   background-size: contain;
-    /* background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center; */
 }
 
-#testCell {
-  border: 1px solid black;
-  width: 80px;
-  height: 80px;
-  /* animation: explosionAnimation 1s infinite; */
-  /* background-image: var(--image);
-  background-size: contain; */
-}
 
 .explosion {
-  animation: explosionAnimation 1s 1;
-  /* background-image: url(./PNG/Effects/Flame_A.png); */
+  animation: explosionAnimation 1s 100;
+  /* background-image: url(./901177/Effects/Flame_A.png); */
   background-size: contain;
 }
 
-/* @keyframes explosionAnimation {
-  0% { 
-    background-image: url(./PNG/Effects/Flash_A_01.png),inherit;
-  }
-  25% { 
-    background-image: url(./PNG/Effects/Flash_A_02.png),inherit;
-  }
-  50% { 
-    background-image: url(./PNG/Effects/Flash_A_03.png),inherit;
-  }
-  75% { 
-    background-image: url(./PNG/Effects/Flash_A_04.png),inherit;
-  }
-  100% {
-    background-image: url(./PNG/Effects/Flash_A_05.png),inherit;
-  }
-} */
 
 @keyframes explosionAnimation {
   0% { 
-    background-image: url(./PNG/Effects/Flash_A_01.png),var(--image);
+    background-image: url(./901177/Effects/Flash_A_01.png);
   }
   25% { 
-    background-image: url(./PNG/Effects/Flash_A_02.png),var(--image);
+    background-image: url(./901177/Effects/Flash_A_02.png);
   }
   50% { 
-    background-image: url(./PNG/Effects/Flash_A_03.png),var(--image);
+    background-image: url(./901177/Effects/Flash_A_03.png);
   }
   75% { 
-    background-image: url(./PNG/Effects/Flash_A_04.png),var(--image);
+    background-image: url(./901177/Effects/Flash_A_04.png);
   }
   100% {
-    background-image: url(./PNG/Effects/Flash_A_05.png),var(--image);
+    background-image: url(./901177/Effects/Flash_A_05.png);
   }
 }
 
 .blueTrooper1{
-  --image: url('./PNG/Hulls_Color_D/Hull_01.png');
+  background-image: url('./901177/Hulls_Color_D/Hull_01.png');
   background-size: contain;
 }
 
 .blueTrooper2{
-  --image: url('./PNG/Hulls_Color_D/Hull_02.png');
+  background-image: url('./901177/Hulls_Color_D/Hull_02.png');
   background-size: contain;
 }
 
 .redTrooper1{
-  --image: url('./PNG/Hulls_Color_A/Hull_01.png');
+  background-image: url('./901177/Hulls_Color_A/Hull_01.png');
   background-size: contain;
 }
 
 .redTrooper2{
-  --image: url('./PNG/Hulls_Color_A/Hull_02.png');
+  background-image: url('./901177/Hulls_Color_A/Hull_02.png');
   background-size: contain;
 }
 
@@ -117,4 +85,13 @@ div{
 
 .highlightFire{
   background-color: rgb(240, 147, 61);
+}
+
+#middleSection{
+  display: flex;
+  flex-direction: row;
+}
+
+.tile{
+  background-image: url(./566611/Tiles/Ground_Tile_01_A.png);
 }

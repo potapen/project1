@@ -9,10 +9,34 @@
   </head>
   <body>
     <h1>war game</h1>
-    <div class="grid"></div>
+    <section id="middleSection">
+      <div class="grid"></div>
+      <div class="infoPanel">
+        <div class="attackerPanel">
+          <h2> attacker </h2>
+          <ul>
+            <li>name:</li><span class="name">test</span>
+            <li>army:</li><span class="army">ds</span>
+            <li>name:</li><span class="name"></span>
+            <li>moveRange:</li><span class="moveRange"></span>
+            <li>fireRange:</li><span class="fireRange"></span>
+            <li>health:</li><span class="health"></span>
+            <li>strength:</li><span class="strength"></span>
+          </ul>
+        </div>
+        <div class="targetPanel">
+          <h2> target</h2>
+        </div>
+        <div class="container">
+          <div class="cellTile tile"></div>
+          <div class="cellHighlight"></div>
+          <div class="cellTank blueTrooper1"></div>
+          <div class="cellTurret"></div>
+          <div class="cellEffect explosion"></div>
+        </div>
+      </div>
+    </section>
     <script src="./main.js"></script>
-    <div class="container blueTrooper1">
-      <div id="testCell" class="explosion"></div>
     </div>
   </body>
 </html>
