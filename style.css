@@ -1,4 +1,3 @@
-
 * {
   box-sizing: border-box;
 }
@@ -65,7 +64,8 @@ div{
 
 .cellTurret{
   background-image: var(--turretImageUrl);
-  transform: rotate(45deg);
+  --turretAngle : 45deg;
+  transform: rotate(var(--turretAngle));
 }
 .blueTrooper1{
   --tankImageUrl : url(./901177/Hulls_Color_D/Hull_01.png);

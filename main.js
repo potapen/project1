@@ -281,8 +281,23 @@ const game = {
 
     }
 }
-
+function computeAngle(x1,y1,x2,y2){
+    const a = Math.sqrt( y1 * y1 )
+    const b = Math.sqrt((x2-x1) * (x2-x1) + (y2-y1) * (y2-y1))
+    const c = Math.sqrt( (x2-x1) * (x2-x1) + y2 * y2 )
+    const numerator = a*a + b*b -c*c
+    const denominator = 2*a*b
+    const angle = Math.acos(numerator/denominator)*180/Math.PI
+    return (x2>x1)? angle: 360 - angle
+}
 game.initGame()
 document.addEventListener('click', game.handleClick.bind(game)) 
-
+gridElt.addEventListener("mousemove", e => {
+    const offsetX = 10
+    const offsetY = 80
+    const angle = computeAngle(368,280,e.clientX,e.clientY)
+    console.log(`x,y: ${e.clientX},${e.clientY}, angle: ${angle}`)
+    const turretElt = document.querySelector('.cellTurret.blueTrooper1')
+    turretElt.style.setProperty('--turretAngle', angle + "deg");
+});
 console.log('fin')
