@@ -207,15 +207,16 @@ const game = {
     armies : {}, //{blue: blueTroopersArray, red: redTroopersArray}
     lastTrooperIndexesPerArmy: {}, //{blue: 0, red: 1}
     selectedUnit : {}, //a trooper, whatever the army
+    selectedUnitIndex : 0,
     currentArmy : '', //blue or red
     currentPhase : '', //move or fire
     initGame(){
-        const blueTrooper1 = new Trooper(3,5,'blue','blueTrooper1',1,2,100,20)
-        const blueTrooper2 = new Trooper(5,5,'blue','blueTrooper2',1,2,100,20)
+        const blueTrooper1 = new Trooper(3,2,'blue','blueTrooper1',1,2,100,20)
+        const blueTrooper2 = new Trooper(5,2,'blue','blueTrooper2',1,2,100,20)
         this.blueTroopersArray.push(blueTrooper1)
         this.blueTroopersArray.push(blueTrooper2)
-        const redTrooper1 = new Trooper(3,7,'red','redTrooper1',1,2,110,15)
-        const redTrooper2 = new Trooper(5,7,'red','redTrooper2',1,2,110,15)
+        const redTrooper1 = new Trooper(3,9,'red','redTrooper1',1,2,110,15)
+        const redTrooper2 = new Trooper(5,9,'red','redTrooper2',1,2,110,15)
         this.redTroopersArray.push(redTrooper1)
         this.redTroopersArray.push(redTrooper2)
         this.armies['blue'] = this.blueTroopersArray
@@ -325,7 +326,10 @@ gridElt.addEventListener("mousemove", e => {
     const offsetY = 80
     const angle = computeAngle(368,280,e.clientX,e.clientY)
     console.log(`x,y: ${e.clientX},${e.clientY}, angle: ${angle}`)
-    const turretElt = document.querySelector('.cellTurret.blueTrooper1')
+    const selectedUnit = game.selectedUnit
+    const index = convertCoordinateToIndex(selectedUnit.x, selectedUnit.y)
+    const container = cellsArray[index]
+    const turretElt = container.querySelector('.cellTurret')
     turretElt.style.setProperty('--turretAngle', angle + "deg");
 });
 console.log('fin')
