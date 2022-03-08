@@ -30,7 +30,8 @@ function createContainerCell(i) {
     
     createCell('div','cellTile',containerCell)
     createCell('div','cellHighlight',containerCell)
-    createCell('div','cellTank',containerCell)
+    const cellTankElt = createCell('div','cellTank',containerCell)
+    // cellTankElt.classList.add('hidding')
     createCell('div','cellTurret',containerCell)
     createCell('div','cellEffect',containerCell)
     const cell = createCell('div','cell',containerCell)
