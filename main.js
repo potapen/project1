@@ -5,6 +5,8 @@ const attackerPanelElt = document.querySelector('.attackerPanel')
 const gridWidth = 10
 const gridHeight = 10
 const cellsArray = []
+const cellWidth = 80
+const cellHeight = 80
 
 
 for (let i = 0; i < gridWidth * gridHeight; i++) {
@@ -72,23 +74,29 @@ class Trooper{
         this.reachableCellsArray = []
         this.fireCellsArray = []
     }
+    getIndex(){
+        const index = convertCoordinateToIndex(this.x, this.y)
+        return index
+    }
     showOnMap(){
         console.log('show on map')
-        const i = convertCoordinateToIndex(this.x, this.y)
+        const index = this.getIndex()
         // console.log('this.name: ', this.name)
-        cellsArray[i].querySelector('.cellTank').classList.add(this.name)
-        cellsArray[i].querySelector('.cellTurret').classList.add(this.name)
-        cellsArray[i].querySelector('.cellTank').classList.add(this.army)
-        cellsArray[i].querySelector('.cellTurret').classList.add(this.army)
+        cellsArray[index].querySelector('.cellTank').classList.add(this.name)
+        cellsArray[index].querySelector('.cellTurret').classList.add(this.name)
+        cellsArray[index].querySelector('.cellTank').classList.add(this.army)
+        cellsArray[index].querySelector('.cellTurret').classList.add(this.army)
     }
 
     removeFromMap(){
         console.log('remove from map')
-        const i = convertCoordinateToIndex(this.x, this.y)
-        cellsArray[i].querySelector('.cellTank').classList.remove(this.name)
-        cellsArray[i].querySelector('.cellTurret').classList.remove(this.name)
-        cellsArray[i].querySelector('.cellTank').classList.remove(this.army)
-        cellsArray[i].querySelector('.cellTurret').classList.remove(this.army)
+        const index = this.getIndex()
+        cellsArray[index].querySelector('.cellTank').classList.remove(this.name)
+        cellsArray[index].querySelector('.cellTurret').classList.remove(this.name)
+        cellsArray[index].querySelector('.cellTank').classList.remove(this.army)
+        cellsArray[index].querySelector('.cellTurret').classList.remove(this.army)
+        cellsArray[index].querySelector('.cellTurret').style.removeProperty('--turretAngle')
+
     }
 
     computeNextMoveCells(){
@@ -146,6 +154,8 @@ class Trooper{
             const cell = this.fireCellsArray.shift() //remove the cell from the this.reachableCellsArray
             cell.classList.remove('highlightFire') //remove the tag from the cell
         }
+        const index = this.getIndex()
+        cellsArray[index].querySelector('.cellTurret').style.removeProperty('--turretAngle')
     }
 
     showNextMoveCells(){
@@ -245,7 +255,7 @@ const game = {
             troopersArray = this.armies[army]
             console.log('troopersArray: ', troopersArray)
             troopersArray.forEach( trooper =>{
-                const index = convertCoordinateToIndex(trooper.x, trooper.y)
+                const index = trooper.getIndex()
                 const container = cellsArray[index]
                 const cellTank = container.querySelector('.cellTank')
                 const cellTurret = container.querySelector('.cellTurret')
@@ -322,12 +332,17 @@ function computeAngle(x1,y1,x2,y2){
 game.initGame()
 document.addEventListener('click', game.handleClick.bind(game)) 
 gridElt.addEventListener("mousemove", e => {
-    const offsetX = 10
+    const offsetX = 0
     const offsetY = 80
-    const angle = computeAngle(368,280,e.clientX,e.clientY)
-    console.log(`x,y: ${e.clientX},${e.clientY}, angle: ${angle}`)
+
     const selectedUnit = game.selectedUnit
-    const index = convertCoordinateToIndex(selectedUnit.x, selectedUnit.y)
+    console.log(selectedUnit)
+    const X = cellWidth/2 + (selectedUnit.y -1)*cellWidth + offsetX
+    const Y = cellHeight/2 + (selectedUnit.x -1)*cellHeight + offsetY
+    console.log(e.clientX,e.clientY,X,Y)
+    const angle = computeAngle(X,Y,e.clientX,e.clientY)
+
+    const index = selectedUnit.getIndex()
     const container = cellsArray[index]
     const turretElt = container.querySelector('.cellTurret')
     turretElt.style.setProperty('--turretAngle', angle + "deg");
