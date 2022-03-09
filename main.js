@@ -331,8 +331,8 @@ class Game{
         const armySize = this.armies[this.currentArmy].length //size of army, int
         if(this.armies['blue'].length === 0 && this.armies['red'].length === 0){ //the last unit probably shot itself
             console.log('it is a tie')
-            document.removeEventListener('click', clickCallback)
-            gridElt.removeEventListener('mousemove', moveCallback)
+            document.removeEventListener('click', this.handleClick)
+            gridElt.removeEventListener('mousemove', this.handleMouse)
         }
         else if(armySize === 0){ //all troopers are gone, the game is finished
             console.log(`game over, ${previousArmy} won`)
@@ -357,7 +357,7 @@ class Game{
     /*
     we handle the state machine of the game here. The game has 2 phases: move and fire.
     */
-    handleClick(event){
+    handleClick = (event)=>{ //I use arrow function to keep 'this' pointing to myGame
         console.log('handleClick event: ',event)
         if(event.target.classList.contains('cell')){ //we click on a cell of the grid
             const index = Number(event.target.id) //this is the index of the cell on which we click
@@ -383,7 +383,7 @@ class Game{
             }
         }
     }
-    handleMouse(e){
+    handleMouse = (e) => { //I use arrow function to keep 'this' pointing to myGame
         //offset are probably created from other element like the title.
         const offsetX = 0
         const offsetY = 80
@@ -403,26 +403,26 @@ class Game{
             /*
             <div class="cellTurret blueTrooper1 blue" style="--turretAngle: 150deg;"></div>
             */
-        }
-    
-    
-    
-        //second part is to update the targetPanel with info from the tank under the mouse
-        targetPanelElt.querySelector('.coordinate').innerText = `${e.clientX}:${e.clientY}`
-        const target = event.target
-        const parentNode = target.parentNode
-        const cellTank = parentNode.querySelector('.cellTank')
-        if(cellTank){ //check if we selected a valid cell
-            const classArray = cellTank.classList //<div class="cellTank blueTrooper1 blue"></div>
-            if(classArray.length>1){ //this means the target element contains a tank, otherwise it would just contain <div class="cellTank"></div>
-                const targetIndex = target.id
-                const targetTank = selectedUnit.checkWhoIsInThisCell(targetIndex)//we can call the checkWhoIsInThisCell from any tank, it does not matter
-                if(targetTank){ //in case the tank has been destroyed, we don't want to get lot of undefined errors
-                    targetTank.displayInfoPanel(targetPanelElt)
+
+
+            //second part is to update the targetPanel with info from the tank under the mouse
+            targetPanelElt.querySelector('.coordinate').innerText = `${e.clientX}:${e.clientY}`
+            const target = event.target
+            const parentNode = target.parentNode
+            const cellTank = parentNode.querySelector('.cellTank')
+            if(cellTank){ //check if we selected a valid cell
+                const classArray = cellTank.classList //<div class="cellTank blueTrooper1 blue"></div>
+                if(classArray.length>1){ //this means the target element contains a tank, otherwise it would just contain <div class="cellTank"></div>
+                    const targetIndex = target.id
+                    const targetTank = selectedUnit.checkWhoIsInThisCell(targetIndex)//we can call the checkWhoIsInThisCell from any tank, it does not matter
+                    if(targetTank){ //in case the tank has been destroyed, we don't want to get lot of undefined errors
+                        targetTank.displayInfoPanel(targetPanelElt)
+                    }
                 }
             }
         }
     }
+
     initGame(){
         const allTroopersArray = this.blueTroopersArray.concat(this.redTroopersArray)
         allTroopersArray.forEach( trooper => trooper.showOnMap())
@@ -431,8 +431,7 @@ class Game{
         this.selectedUnit.showNextMoveCells()
         this.animationInitialDeployment() //animation done only at the beginning of the game.
         
-        const clickCallback = this.handleClick.bind(myGame)
-        document.addEventListener('click', clickCallback)
+        document.addEventListener('click', this.handleClick)
         /*
         another listener used for:
         -animating the turret rotation
@@ -440,8 +439,7 @@ class Game{
         */
         
         //A new function reference is created after .bind() is called. So, to add or remove it, assign the reference to a variable
-        const moveCallback = this.handleMouse.bind(myGame)
-        gridElt.addEventListener('mousemove', moveCallback)
+        gridElt.addEventListener('mousemove', this.handleMouse)
     }
 }
 function computeAngle(x1,y1,x2,y2){ //function to compute turret angle using al kashi
