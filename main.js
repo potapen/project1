@@ -209,7 +209,27 @@ class Trooper{
     }
 
     displayInfoPanel(){
-        attackerPanelElt.innerText = this.health
+        const ulElt = attackerPanelElt.querySelector('ul')
+        ulElt.querySelector('.x').innerText = `x: ${this.x}`
+        ulElt.querySelector('.y').innerText = `y: ${this.y}`
+        ulElt.querySelector('.army').innerText = `army: ${this.army}`
+        ulElt.querySelector('.name').innerText = `name: ${this.name}`
+        ulElt.querySelector('.moveRange').innerText = `moveRange: ${this.moveRange}`
+        ulElt.querySelector('.fireRange').innerText = `fireRange: ${this.fireRange}`
+        ulElt.querySelector('.health').innerText = `health: ${this.health}`
+        ulElt.querySelector('.strength').innerText = `strength: ${this.strength}`
+        /*
+        this.x = x
+        this.y = y
+        this.army = army
+        this.name = name
+        this.moveRange = moveRange
+        this.fireRange = fireRange
+        this.health = health
+        this.strength = strength
+        this.reachableCellsArray = []
+        this.fireCellsArray = []
+        */
     }
 }
 const game = {
@@ -233,15 +253,16 @@ const game = {
         this.armies['blue'] = this.blueTroopersArray
         this.armies['red'] = this.redTroopersArray
 
-        this.lastTrooperIndexesPerArmy['blue'] = 0 //0 for the initial army
+        this.lastTrooperIndexesPerArmy['blue'] = -1 //0 for the initial army
         this.lastTrooperIndexesPerArmy['red'] = -1 //-1 for all other armies
 
         
-        this.currentArmy = 'blue'
+        this.currentArmy = 'red' //init at red in order to play first with blue
         this.currentPhase = 'selectMovable'
         const allTroopersArray = this.blueTroopersArray.concat(this.redTroopersArray)
         allTroopersArray.forEach( trooper => trooper.showOnMap())
-        this.selectedUnit = this.blueTroopersArray[0]
+        this.selectNextUnit()
+        //this.selectedUnit = this.blueTroopersArray[0]
 
         this.selectedUnit.computeNextMoveCells()
         this.selectedUnit.showNextMoveCells()
