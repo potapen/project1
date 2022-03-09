@@ -1,88 +1,100 @@
-//populating the grid to display all units
 const gridElt = document.querySelector('.grid')
 const attackerPanelElt = document.querySelector('.attackerPanel')
 const targetPanelElt = document.querySelector('.targetPanel')
 
-const gridWidth = 10
-const gridHeight = 10
-const cellsArray = []
-const cellWidth = 80
-const cellHeight = 80
+const gridWidth = 10 //number of cells on x axis
+const gridHeight = 10 //number of cells on y axis
+const cellsArray = [] //to hold the div after we initialize them
 
+/*
+document.documentElement.style.getPropertyValue('--cellWidth') returns something only if it has been set via document.documentElement.style.setPropertyValue.
+It returns undefined if it has been set through CSS
+ you have to make use of the getComputedStyle()method , before calling .getPropertyValue()
+ */
+const cellWidth = getComputedStyle(document.documentElement,null).getPropertyValue('--cellWidth') //the width of each cell, the value is set in style.css with a custom property --cellWidth
+const cellHeight = getComputedStyle(document.documentElement,null).getPropertyValue('--cellHeight')
+
+
+/*------------------------------------------------------------------------------------------------
+populate the grid with containers
+--------------------------------------------------------------------------------------------------
+*/
 
 for (let i = 0; i < gridWidth * gridHeight; i++) {
     const containerCell = createContainerCell(i)
     cellsArray.push(containerCell)
 }
 
-//matrix starts from (1,1)
-//index starts from 0
-function convertCoordinateToIndex(x,y){
+//The container have coordinate x[1..10] and y[1..10]
+//The container are stored in cellsArray [0..99] with an index
+function convertCoordinateToIndex(x,y){ // helper function to compute index from coordinate x and y
     const i = (x-1)*gridWidth + (y-1)
     return i
 }
 
-function convertIndexToCoordinate(i){
+function convertIndexToCoordinate(i){ // helper function to compute  coordinate x and y from index
     const x = 1 + Math.floor(i/gridWidth)
     const y = 1 + i%gridWidth
     return {x:x,y:y}
 }
+
+/*
+we create div container for display purpose on the grid. A container contains various sub div, each div will be in charge of displaying a visual effect
+<div class="container">
+   <div class="cellTile"></div>
+   <div class="cellHighlight highlightMove"></div>
+   <div class="cellTank blueTrooper1 blue"></div>
+   <div class="cellTurret blueTrooper1 blue" style="--turretAngle: NaNdeg;"></div>
+   <div class="cellEffect"></div>
+   <div class="cell" id="21">21 (3:2)</div>
+</div>
+*/
 function createContainerCell(i) {
     const containerCell = createCell('div','container',gridElt)
-
-    
     createCell('div','cellTile',containerCell)
-    createCell('div','cellHighlight',containerCell)
-    const cellTankElt = createCell('div','cellTank',containerCell)
-    // cellTankElt.classList.add('hidding')
-    createCell('div','cellTurret',containerCell)
-    createCell('div','cellEffect',containerCell)
+    createCell('div','cellHighlight',containerCell)//to display cell highlighting, ex: to show where to move or attack
+    createCell('div','cellTank',containerCell) //to show the body of the tank
+    createCell('div','cellTurret',containerCell) //to show the turret, so it can rotate independantly from the body
+    createCell('div','cellEffect',containerCell)//to display explosion
     const cell = createCell('div','cell',containerCell)
-    cell.id = i
+    cell.id = i //i is the index of the container in cellsArray
     const x = convertIndexToCoordinate(i).x
     const y = convertIndexToCoordinate(i).y
-    cell.innerText = `${i} (${x}:${y})`
-
+    cell.innerText = `${i} (${x}:${y})` //for debugging purpose
     return containerCell
 }
 
-function createCell(cellType='div', cellClass,eltToAppendTo){
+function createCell(cellType='div', cellClass,eltToAppendTo){ //create a cell with a given type, class, and append it as a child to another elt
     const cell = document.createElement(cellType)
     cell.classList.add(cellClass)
     eltToAppendTo.appendChild(cell)
     return cell
 }
-/*
-        <div class="container">
-          <div class="cellTile tile"></div>
-          <div class="cellHighlight"></div>
-          <div class="cellTank blueTrooper1"></div>
-          <div class="cellTurret"></div>
-          <div class="cellEffect explosion"></div>
-        </div>
+/*------------------------------------------------------------------------------------------------
+trooper class
+--------------------------------------------------------------------------------------------------
 */
 
 class Trooper{
     constructor(x,y,army,name,moveRange, fireRange, health,strength){
         this.x = x
         this.y = y
-        this.army = army
-        this.name = name
+        this.army = army //ex: blue, red
+        this.name = name //ex: blueTrooper1, blueTrooper2, redTrooper1, redTrooper2. This is used to set class to element. It has to correspond to the css predefined values.
         this.moveRange = moveRange
         this.fireRange = fireRange
-        this.health = health
-        this.strength = strength
-        this.reachableCellsArray = []
-        this.fireCellsArray = []
+        this.health = health //how much damage the tank takes before dying
+        this.strength = strength //how much damage the take outputs
+        this.reachableCellsArray = [] //where the tank can move during move phase, computed from current (x,y) and moveRange
+        this.fireCellsArray = [] //where the tank can shoot during shoot phase,  computed from current (x,y) and fireRange
     }
-    getIndex(){
+    getIndex(){ //return index to be used in cellsArray corresponding to coordinate (x,y)
         const index = convertCoordinateToIndex(this.x, this.y)
         return index
     }
-    showOnMap(){
+    showOnMap(){ //displaying on the grid is based on tags in containers of cellsArray and the corresponding css.
         console.log('show on map')
         const index = this.getIndex()
-        // console.log('this.name: ', this.name)
         cellsArray[index].querySelector('.cellTank').classList.add(this.name)
         cellsArray[index].querySelector('.cellTurret').classList.add(this.name)
         cellsArray[index].querySelector('.cellTank').classList.add(this.army)
@@ -96,11 +108,12 @@ class Trooper{
         cellsArray[index].querySelector('.cellTurret').classList.remove(this.name)
         cellsArray[index].querySelector('.cellTank').classList.remove(this.army)
         cellsArray[index].querySelector('.cellTurret').classList.remove(this.army)
+        //we assume that the move phase has ended and we reset the --turretAngle, otherwise the previous cell of a tank will be still shown with an angle
         cellsArray[index].querySelector('.cellTurret').style.removeProperty('--turretAngle')
 
     }
 
-    computeNextMoveCells(){
+    computeNextMoveCells(){ //compute the possible cells reachable by the tank according to its current coordinate (x,y) and its moving range
         const reachableCellsArray = []
         for( let i = this.x - this.moveRange  ; i <= this.x + this.moveRange ; i++){
             for (let j = this.y - this.moveRange ; j <= this.y + this.moveRange ; j++){
@@ -111,7 +124,7 @@ class Trooper{
         this.reachableCellsArray = reachableCellsArray
     }
 
-    computeFireCells(){
+    computeFireCells(){ //compute the possible cells reachable by the tank according to its current coordinate (x,y) and its firing range
         const fireCellsArray = []
         for( let i = this.x - this.fireRange  ; i <= this.x + this.fireRange ; i++){
             for (let j = this.y - this.fireRange ; j <= this.y + this.fireRange ; j++){
@@ -121,26 +134,8 @@ class Trooper{
         }
         this.fireCellsArray = fireCellsArray
     }
-
-    checkWhoIsInThisCell(index){
-        const x = convertIndexToCoordinate(index).x
-        const y = convertIndexToCoordinate(index).y
-        let presentTrooper
-        for (let trooper of game.blueTroopersArray){
-            if(trooper.x === x && trooper.y === y){
-                presentTrooper = trooper
-            }
-        }
-        for (let trooper of game.redTroopersArray){
-            if(trooper.x === x && trooper.y === y){
-                presentTrooper = trooper
-            }
-        }
-        return presentTrooper
-
-    }
     
-    removeNextMoveCells(){
+    removeNextMoveCells(){ //empty the reachableCellsArray and remove all tags from cells of the grid
         console.log('removeNextMoveCells function')
         while(this.reachableCellsArray.length > 0){
             const cell = this.reachableCellsArray.shift() //remove the cell from the this.reachableCellsArray
@@ -149,13 +144,14 @@ class Trooper{
         }
     }
 
-    removeNextFireCells(){
+    removeNextFireCells(){//empty the fireCellsArray and remove all tags from cells of the grid
         console.log('removeNextFireCells function')
         while(this.fireCellsArray.length > 0){
             const cell = this.fireCellsArray.shift() //remove the cell from the this.reachableCellsArray
             cell.classList.remove('highlightFire') //remove the tag from the cell
         }
         const index = this.getIndex()
+        //we assume that the firing phase has ended. We remove the 
         cellsArray[index].querySelector('.cellTurret').style.removeProperty('--turretAngle')
     }
 
@@ -172,10 +168,32 @@ class Trooper{
         })
     }
 
+    checkWhoIsInThisCell(index){ //check if there is a tank in the cell where we shoot (defined by its index), return an trooper object
+        const x = convertIndexToCoordinate(index).x
+        const y = convertIndexToCoordinate(index).y
+        let presentTrooper //the target tank, empty if there is no tank
+
+        for (let trooper of game.blueTroopersArray){ //we cycle through arrays of trooper to look for a trooper with matching coordinate.
+            if(trooper.x === x && trooper.y === y){
+                presentTrooper = trooper
+            }
+        }
+        for (let trooper of game.redTroopersArray){ //we need to cycle through all the armies
+            if(trooper.x === x && trooper.y === y){
+                presentTrooper = trooper
+            }
+        }
+        return presentTrooper
+    }
+
+    /*
+    to move a tank we need to do 2 things:
+    -change the coordinate of the tank (attribute x and y)
+    -update the map () (where we add the tags to the right cell)
+    */
     move = (index)=>{ //I am using an arrow function here so that 'this' can still refers to the trooper object, instead of the cell
         console.log('move function')
         this.removeFromMap() //we remove the trooper's tag from its current position
-        // console.log('this.name :', this.name)
         const coordinate = convertIndexToCoordinate(index) //we convert index to x,y
         this.x = coordinate.x //we update the coordinate of the trooper
         this.y = coordinate.y
@@ -183,20 +201,25 @@ class Trooper{
 
     }
 
+    /*
+    to fire we do two things:
+    -at the index where we shoot, check if there is a target. If yes, compute damange.
+    -in all cases, display some explosion effect where we shoot.
+    */
     fire = (index)=>{ //I am using an arrow function here so that 'this' can still refers to the trooper object, instead of the cell
         console.log('fire function')
         const target = this.checkWhoIsInThisCell(index)
-        if (target){
-            target.takeDamage(this.strength)
+        if (target){ //if there is a target tank where we shoot
+            target.takeDamage(this.strength)//compute damage on the target ennemy
         }
         this.addExplosionEffect(index)
-        //compute some damage on ennemies
+
     }
 
     takeDamage(damage){
         this.health -= damage
     }
-
+    // we add explosion effect, then remove it after 1 second. Otherwise the grid is polluted with old explosion class.
     addExplosionEffect(index){
         console.log('addExplosionEffect function')
         const cellEffectElt = cellsArray[index].querySelector('.cellEffect') 
@@ -208,7 +231,7 @@ class Trooper{
         
     }
 
-    displayInfoPanel(){
+    displayInfoPanel(){ //populate a panel (either attacker or target) with info from a tank
         const ulElt = attackerPanelElt.querySelector('ul')
         ulElt.querySelector('.x').innerText = `x: ${this.x}`
         ulElt.querySelector('.y').innerText = `y: ${this.y}`
@@ -218,30 +241,24 @@ class Trooper{
         ulElt.querySelector('.fireRange').innerText = `fireRange: ${this.fireRange}`
         ulElt.querySelector('.health').innerText = `health: ${this.health}`
         ulElt.querySelector('.strength').innerText = `strength: ${this.strength}`
-        /*
-        this.x = x
-        this.y = y
-        this.army = army
-        this.name = name
-        this.moveRange = moveRange
-        this.fireRange = fireRange
-        this.health = health
-        this.strength = strength
-        this.reachableCellsArray = []
-        this.fireCellsArray = []
-        */
     }
 }
+
+/*------------------------------------------------------------------------------------------------
+game class
+--------------------------------------------------------------------------------------------------
+*/
 const game = {
     blueTroopersArray : [],
     redTroopersArray :  [],
     armies : {}, //{blue: blueTroopersArray, red: redTroopersArray}
     lastTrooperIndexesPerArmy: {}, //{blue: 0, red: 1}
-    selectedUnit : {}, //a trooper, whatever the army
+    selectedUnit : {}, //a trooper object, whatever the army
     selectedUnitIndex : 0,
     currentArmy : '', //blue or red
     currentPhase : '', //move or fire
     initGame(){
+        //populate the blueTroopersArray and redTroopersArray
         const blueTrooper1 = new Trooper(3,2,'blue','blueTrooper1',1,2,100,20)
         const blueTrooper2 = new Trooper(5,2,'blue','blueTrooper2',1,2,100,20)
         this.blueTroopersArray.push(blueTrooper1)
@@ -253,38 +270,35 @@ const game = {
         this.armies['blue'] = this.blueTroopersArray
         this.armies['red'] = this.redTroopersArray
 
-        this.lastTrooperIndexesPerArmy['blue'] = -1 //0 for the initial army
-        this.lastTrooperIndexesPerArmy['red'] = -1 //-1 for all other armies
+        this.lastTrooperIndexesPerArmy['blue'] = -1 //we set to -1 because the first thing we do is to increment this counter inselectNextUnit
+        this.lastTrooperIndexesPerArmy['red'] = -1 
 
         
-        this.currentArmy = 'red' //init at red in order to play first with blue
-        this.currentPhase = 'selectMovable'
+        this.currentArmy = 'red' //init at red in order to play first with blue, because the first things to do is to select the opposite army in selectNextUnit
+        this.currentPhase = 'move'
         const allTroopersArray = this.blueTroopersArray.concat(this.redTroopersArray)
         allTroopersArray.forEach( trooper => trooper.showOnMap())
-        this.selectNextUnit()
-        //this.selectedUnit = this.blueTroopersArray[0]
+        this.selectNextUnit() //define the first tank to play
 
         this.selectedUnit.computeNextMoveCells()
         this.selectedUnit.showNextMoveCells()
-        this.animationInitialDeployment()
+        this.animationInitialDeployment() //animation done only at the beginning of the game.
         
     },
-    animationInitialDeployment(){
+    animationInitialDeployment(){ //move blue tanks from outside on left, red tanks from outside on right
         console.log('animationInitialDeployment function')
         const armiesArray = Object.keys(this.armies) //Array [ "blue", "red" ]
-        console.log('armiesArray: ', armiesArray)
         armiesArray.forEach( army => {
             troopersArray = this.armies[army]
-            console.log('troopersArray: ', troopersArray)
             troopersArray.forEach( trooper =>{
                 const index = trooper.getIndex()
                 const container = cellsArray[index]
-                const cellTank = container.querySelector('.cellTank')
+                const cellTank = container.querySelector('.cellTank') //we need to animate both the tank and the turrets, which are independant images
                 const cellTurret = container.querySelector('.cellTurret')
-                cellTank.classList.add('hiding')
+                cellTank.classList.add('hiding') //with hiding class, the tanks are positioned outside of the grid
                 cellTurret.classList.add('hiding')
                 setTimeout(() => {
-                    cellTank.classList.remove('hiding')
+                    cellTank.classList.remove('hiding') //without hiding, the tanks are positioned in there respective cells
                     cellTurret.classList.remove('hiding')
     
                 }
@@ -293,35 +307,39 @@ const game = {
             })
         })
     },
-    selectNextUnit(){
+    selectNextUnit(){ //select the next trooper to play for a given army (blue or red).
         this.currentArmy = this.currentArmy === 'blue' ? 'red' : 'blue'
-        console.log('selectNextUnit this.currentArmy: ', this.currentArmy)
-        /*
-        selectionner le prochain trooper
-        index+1 % lengths
-        passer au suivant s'il le next trooper est mort
+        console.log('selectNextUnit function')
+
+        const lastIndex = this.lastTrooperIndexesPerArmy[this.currentArmy] //index of last trooper that played for a given army, int
+        const armySize = this.armies[this.currentArmy].length //size of army, int
+        const nextIndex = (lastIndex + 1) % armySize //select the next trooper
+
+        /* 
+        TODO: handle dead soldier so that we cannot select them anymore
         */
-        const lastIndex = this.lastTrooperIndexesPerArmy[this.currentArmy] //index of last trooper for a given army, ex: this.currentArmy = blue
-        console.log('selectNextUnit lastIndex: ', lastIndex)
-        const armySize = this.armies[this.currentArmy].length //size of army,ex: this.currentArmy = blue
-        const nextIndex = (lastIndex + 1) % armySize
         this.lastTrooperIndexesPerArmy[this.currentArmy] = nextIndex
         this.selectedUnit = this.armies[this.currentArmy][nextIndex%armySize]
-        console.log('this.selectedUnit: ', this.selectedUnit)
+
         this.selectedUnit.computeNextMoveCells()
         this.selectedUnit.showNextMoveCells()
-        this.selectedUnit.displayInfoPanel()
+        this.selectedUnit.displayInfoPanel() //once the unit is selected we can show its info on the attacker's panel
+
     },
+
+    /*
+    we handle the state machine of the game here. The game has 2 phases: move and fire.
+    */
     handleClick(event){
         console.log('handleClick event: ',event)
         if(event.target.classList.contains('cell')){ //we click on a cell of the grid
             const index = Number(event.target.id) //this is the index of the cell on which we click
             switch(game.currentPhase){
-                case 'selectMovable':
-                    console.log('switch case selectMovable')
-                    this.selectedUnit.computeNextMoveCells()
-                    this.selectedUnit.showNextMoveCells()
-                    game.currentPhase = 'move'
+                // case 'selectMovable':
+                //     console.log('switch case selectMovable')
+                //     this.selectedUnit.computeNextMoveCells()
+                //     this.selectedUnit.showNextMoveCells()
+                //     game.currentPhase = 'move'
                 case 'move':
                     console.log('switch case move')
                     this.selectedUnit.removeNextMoveCells()
@@ -335,24 +353,37 @@ const game = {
                     this.selectedUnit.fire(index)
                     this.selectedUnit.removeNextFireCells()
                     this.selectNextUnit()
-                    this.currentPhase = 'selectMovable'
+                    this.currentPhase = 'move'
                     break
             }
         }
 
     }
 }
-function computeAngle(x1,y1,x2,y2){
+function computeAngle(x1,y1,x2,y2){ //function to compute turret angle using al kashi
+    //(x1,y1) is the center of the selected tank
+    //(x2,y2) is the position of the mouse
     const a = Math.sqrt( y1 * y1 )
     const b = Math.sqrt((x2-x1) * (x2-x1) + (y2-y1) * (y2-y1))
     const c = Math.sqrt( (x2-x1) * (x2-x1) + y2 * y2 )
     const numerator = a*a + b*b -c*c
     const denominator = 2*a*b
     const angle = Math.acos(numerator/denominator)*180/Math.PI
-    return (x2>x1)? angle: 360 - angle
+    return (x2>x1)? angle: 360 - angle //al kashi only compute from 0 to 180 degree. We need to take into account the other half.
 }
+
+/*------------------------------------------------------------------------------------------------
+script
+--------------------------------------------------------------------------------------------------
+*/
 game.initGame()
-document.addEventListener('click', game.handleClick.bind(game)) 
+document.addEventListener('click', game.handleClick.bind(game))
+
+/*
+another listener used for:
+-animating the turret rotation
+-updating in real time the target info panel
+*/
 gridElt.addEventListener("mousemove", e => {
     const offsetX = 0
     const offsetY = 80

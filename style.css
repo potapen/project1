@@ -6,6 +6,10 @@ div{
     border: black 1px solid;
 }
 
+:root{
+  --cellWidth: 80px;
+  --cellHeight: 80px;
+}
   
 .grid {
     display: flex;
@@ -18,8 +22,8 @@ div{
 .container{
   position: relative;
   border: 1px solid black;
-  width: 80px;
-  height: 80px;
+  width: var(--cellWidth);
+  height: var(--cellHeight);
 }
 
 .container > div{
