@@ -298,13 +298,17 @@ const game = {
     initGame(){
         //populate the blueTroopersArray and redTroopersArray
         const blueTrooper1 = new Trooper(3,2,'blue','blueTrooper1',1,2,12,20)
-        const blueTrooper2 = new Trooper(5,2,'blue','blueTrooper2',1,2,12,20)
+        // const blueTrooper2 = new Trooper(5,2,'blue','blueTrooper2',1,2,12,20)
+        // const blueTrooper3 = new Trooper(7,2,'blue','blueTrooper2',1,2,12,20)
         this.blueTroopersArray.push(blueTrooper1)
-        this.blueTroopersArray.push(blueTrooper2)
+        // this.blueTroopersArray.push(blueTrooper2)
+        // this.blueTroopersArray.push(blueTrooper3)
         const redTrooper1 = new Trooper(3,9,'red','redTrooper1',1,2,10,15)
-        const redTrooper2 = new Trooper(5,9,'red','redTrooper2',1,2,10,15)
+        // const redTrooper2 = new Trooper(5,9,'red','redTrooper2',1,2,10,15)
+        // const redTrooper3 = new Trooper(7,9,'red','redTrooper2',1,2,10,15)
         this.redTroopersArray.push(redTrooper1)
-        this.redTroopersArray.push(redTrooper2)
+        // this.redTroopersArray.push(redTrooper2)
+        // this.redTroopersArray.push(redTrooper3)
         this.armies['blue'] = this.blueTroopersArray
         this.armies['red'] = this.redTroopersArray
 
@@ -346,23 +350,34 @@ const game = {
         })
     },
     selectNextUnit(){ //select the next trooper to play for a given army (blue or red).
+        const previousArmy = this.currentArmy
         this.currentArmy = this.currentArmy === 'blue' ? 'red' : 'blue'
         console.log('selectNextUnit function')
 
         const lastIndex = this.lastTrooperIndexesPerArmy[this.currentArmy] //index of last trooper that played for a given army, int
         const armySize = this.armies[this.currentArmy].length //size of army, int
-        const nextIndex = (lastIndex + 1) % armySize //select the next trooper
+        if(this.armies['blue'].length === 0 && this.armies['red'].length === 0){ //the last unit probably shot itself
+            console.log('it is a tie')
+            document.removeEventListener('click', game.handleClick.bind(game))
+        }
+        else if(armySize === 0){ //all troopers are gone, the game is finished
+            console.log(`game over, ${previousArmy} won`)
+            this.currentPhase = 'gameOver'
 
-        /* 
-        TODO: handle dead soldier so that we cannot select them anymore
-        */
-        this.lastTrooperIndexesPerArmy[this.currentArmy] = nextIndex
-        this.selectedUnit = this.armies[this.currentArmy][nextIndex%armySize]
+        }else{
+            /* 
+            TODO: handle dead soldier so that we cannot select them anymore
+            */
+            const nextIndex = (lastIndex + 1) % armySize //select the next trooper
+            this.lastTrooperIndexesPerArmy[this.currentArmy] = nextIndex
+            this.selectedUnit = this.armies[this.currentArmy][nextIndex%armySize]
 
-        this.selectedUnit.computeNextMoveCells()
-        this.selectedUnit.showNextMoveCells()
-        
-        this.selectedUnit.displayInfoPanel(attackerPanelElt) //once the unit is selected we can show its info on the attacker's panel
+            this.selectedUnit.computeNextMoveCells()
+            this.selectedUnit.showNextMoveCells()
+            
+            this.selectedUnit.displayInfoPanel(attackerPanelElt) //once the unit is selected we can show its info on the attacker's panel
+        }
+
 
     },
     /*
@@ -387,6 +402,9 @@ const game = {
                     this.selectedUnit.removeNextFireCells()
                     this.selectNextUnit()
                     this.currentPhase = 'move'
+                    break
+                case 'gameOver':
+                    this.selectNextUnit()
                     break
             }
         }
