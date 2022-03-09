@@ -174,12 +174,12 @@ class Trooper{
         const y = convertIndexToCoordinate(index).y
         let presentTrooper //the target tank, empty if there is no tank
 
-        for (let trooper of game.blueTroopersArray){ //we cycle through arrays of trooper to look for a trooper with matching coordinate.
+        for (let trooper of myGame.blueTroopersArray){ //we cycle through arrays of trooper to look for a trooper with matching coordinate.
             if(trooper.x === x && trooper.y === y){
                 presentTrooper = trooper
             }
         }
-        for (let trooper of game.redTroopersArray){ //we need to cycle through all the armies
+        for (let trooper of myGame.redTroopersArray){ //we need to cycle through all the armies
             if(trooper.x === x && trooper.y === y){
                 presentTrooper = trooper
             }
@@ -228,8 +228,8 @@ class Trooper{
         //deadTrooper.removeFromMap()
         console.log('deadTrooper :', deadTrooper)
         const army = deadTrooper.army
-        const removeIndex = game.armies[army].indexOf(deadTrooper)
-        game.armies[army].splice(removeIndex,1)
+        const removeIndex = myGame.armies[army].indexOf(deadTrooper)
+        myGame.armies[army].splice(removeIndex,1)
         return deadTrooper
         
     }
@@ -287,52 +287,24 @@ class Trooper{
 game class
 --------------------------------------------------------------------------------------------------
 */
-const game = {
-    blueTroopersArray : [],
-    redTroopersArray :  [],
-    armies : {}, //{blue: blueTroopersArray, red: redTroopersArray}
-    lastTrooperIndexesPerArmy: {}, //{blue: 0, red: 1}
-    selectedUnit : {}, //a trooper object, whatever the army
-    selectedUnitIndex : 0,
-    currentArmy : '', //blue or red
-    currentPhase : '', //move or fire
-    initGame(){
-        //populate the blueTroopersArray and redTroopersArray
-        const blueTrooper1 = new Trooper(3,2,'blue','blueTrooper1',1,2,12,20)
-        // const blueTrooper2 = new Trooper(5,2,'blue','blueTrooper2',1,2,12,20)
-        // const blueTrooper3 = new Trooper(7,2,'blue','blueTrooper2',1,2,12,20)
-        this.blueTroopersArray.push(blueTrooper1)
-        // this.blueTroopersArray.push(blueTrooper2)
-        // this.blueTroopersArray.push(blueTrooper3)
-        const redTrooper1 = new Trooper(3,9,'red','redTrooper1',1,2,10,15)
-        // const redTrooper2 = new Trooper(5,9,'red','redTrooper2',1,2,10,15)
-        // const redTrooper3 = new Trooper(7,9,'red','redTrooper2',1,2,10,15)
-        this.redTroopersArray.push(redTrooper1)
-        // this.redTroopersArray.push(redTrooper2)
-        // this.redTroopersArray.push(redTrooper3)
-        this.armies['blue'] = this.blueTroopersArray
-        this.armies['red'] = this.redTroopersArray
+class Game{
+    constructor(blueTroopersArray, redTroopersArray,armies,lastTrooperIndexesPerArmy,selectedUnit,selectedUnitIndex,currentArmy,currentPhase){
+        this.blueTroopersArray = blueTroopersArray
+        this.redTroopersArray = redTroopersArray
+        this.armies = armies //{blue: blueTroopersArray, red: redTroopersArray}
+        this.lastTrooperIndexesPerArmy = lastTrooperIndexesPerArmy //{blue: 0, red: 1}
+        this.selectedUnit = selectedUnit //a trooper object, whatever the army
+        this.selectedUnitIndex = selectedUnitIndex
+        this.currentArmy = currentArmy //blue or red
+        this.currentPhase = currentPhase
+    }
 
-        this.lastTrooperIndexesPerArmy['blue'] = -1 //we set to -1 because the first thing we do is to increment this counter inselectNextUnit
-        this.lastTrooperIndexesPerArmy['red'] = -1 
-
-        
-        this.currentArmy = 'red' //init at red in order to play first with blue, because the first things to do is to select the opposite army in selectNextUnit
-        this.currentPhase = 'move'
-        const allTroopersArray = this.blueTroopersArray.concat(this.redTroopersArray)
-        allTroopersArray.forEach( trooper => trooper.showOnMap())
-        this.selectNextUnit() //define the first tank to play
-
-        this.selectedUnit.computeNextMoveCells()
-        this.selectedUnit.showNextMoveCells()
-        this.animationInitialDeployment() //animation done only at the beginning of the game.
-        
-    },
     animationInitialDeployment(){ //move blue tanks from outside on left, red tanks from outside on right
         console.log('animationInitialDeployment function')
+        console.log('this: ', this)
         const armiesArray = Object.keys(this.armies) //Array [ "blue", "red" ]
         armiesArray.forEach( army => {
-            troopersArray = this.armies[army]
+            const troopersArray = this.armies[army]
             troopersArray.forEach( trooper =>{
                 const index = trooper.getIndex()
                 const container = cellsArray[index]
@@ -349,7 +321,7 @@ const game = {
     
             })
         })
-    },
+    }
     selectNextUnit(){ //select the next trooper to play for a given army (blue or red).
         const previousArmy = this.currentArmy
         this.currentArmy = this.currentArmy === 'blue' ? 'red' : 'blue'
@@ -381,7 +353,7 @@ const game = {
         }
 
 
-    },
+    }
     /*
     we handle the state machine of the game here. The game has 2 phases: move and fire.
     */
@@ -389,14 +361,14 @@ const game = {
         console.log('handleClick event: ',event)
         if(event.target.classList.contains('cell')){ //we click on a cell of the grid
             const index = Number(event.target.id) //this is the index of the cell on which we click
-            switch(game.currentPhase){
+            switch(this.currentPhase){
                 case 'move':
                     console.log('switch case move')
                     this.selectedUnit.removeNextMoveCells()
                     this.selectedUnit.move(index)
                     this.selectedUnit.computeFireCells()
                     this.selectedUnit.showFireCells()
-                    game.currentPhase = 'fire'
+                    this.currentPhase = 'fire'
                     break
                 case 'fire':
                     console.log('switch case fire')
@@ -410,7 +382,7 @@ const game = {
                     break
             }
         }
-    },
+    }
     handleMouse(e){
         //offset are probably created from other element like the title.
         const offsetX = 0
@@ -450,7 +422,26 @@ const game = {
                 }
             }
         }
-
+    }
+    initGame(){
+        const allTroopersArray = this.blueTroopersArray.concat(this.redTroopersArray)
+        allTroopersArray.forEach( trooper => trooper.showOnMap())
+        this.selectNextUnit() //define the first tank to play
+        this.selectedUnit.computeNextMoveCells()
+        this.selectedUnit.showNextMoveCells()
+        this.animationInitialDeployment() //animation done only at the beginning of the game.
+        
+        const clickCallback = this.handleClick.bind(myGame)
+        document.addEventListener('click', clickCallback)
+        /*
+        another listener used for:
+        -animating the turret rotation
+        -updating in real time the target info panel
+        */
+        
+        //A new function reference is created after .bind() is called. So, to add or remove it, assign the reference to a variable
+        const moveCallback = this.handleMouse.bind(myGame)
+        gridElt.addEventListener('mousemove', moveCallback)
     }
 }
 function computeAngle(x1,y1,x2,y2){ //function to compute turret angle using al kashi
@@ -466,25 +457,40 @@ function computeAngle(x1,y1,x2,y2){ //function to compute turret angle using al 
 }
 
 /*------------------------------------------------------------------------------------------------
-main
+game parameters
 --------------------------------------------------------------------------------------------------
 */
-game.initGame()
 
-const clickCallback = game.handleClick.bind(game)
-document.addEventListener('click', clickCallback)
+//populate the blueTroopersArray and redTroopersArray
+const blueTrooper1 = new Trooper(3,2,'blue','blueTrooper1',1,2,12,20)
+// const blueTrooper2 = new Trooper(5,2,'blue','blueTrooper2',1,2,12,20)
+// const blueTrooper3 = new Trooper(7,2,'blue','blueTrooper2',1,2,12,20)
+const blueTroopersArray = []
+blueTroopersArray.push(blueTrooper1)
+// this.blueTroopersArray.push(blueTrooper2)
+// this.blueTroopersArray.push(blueTrooper3)
+const redTrooper1 = new Trooper(3,9,'red','redTrooper1',1,2,10,15)
+// const redTrooper2 = new Trooper(5,9,'red','redTrooper2',1,2,10,15)
+// const redTrooper3 = new Trooper(7,9,'red','redTrooper2',1,2,10,15)
+const redTroopersArray = []
+redTroopersArray.push(redTrooper1)
+// this.redTroopersArray.push(redTrooper2)
+// this.redTroopersArray.push(redTrooper3)
+const armies = {}
+armies['blue'] = blueTroopersArray
+armies['red'] = redTroopersArray
 
-/*
-another listener used for:
--animating the turret rotation
--updating in real time the target info panel
-*/
-
-//A new function reference is created after .bind() is called. So, to add or remove it, assign the reference to a variable
-const moveCallback = game.handleMouse.bind(game)
-gridElt.addEventListener('mousemove', moveCallback)
+console.log('armies:', armies)
+console.log("armies['blue']: ",armies['blue'])
+const lastTrooperIndexesPerArmy = []
+lastTrooperIndexesPerArmy['blue'] = -1 //we set to -1 because the first thing we do is to increment this counter inselectNextUnit
+lastTrooperIndexesPerArmy['red'] = -1 
 
 
-// const display = (e) => {console.log(e)}
-// gridElt.addEventListener('mousemove', display)
-// gridElt.removeEventListener('mousemove', display)
+const currentArmy = 'red' //init at red in order to play first with blue, because the first things to do is to select the opposite army in selectNextUnit
+const currentPhase = 'move'
+
+
+const myGame = new Game(blueTroopersArray, redTroopersArray,armies,lastTrooperIndexesPerArmy,[],-1,currentArmy,currentPhase)
+myGame.initGame()
+
