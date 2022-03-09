@@ -38,13 +38,19 @@ div{
 
 
 .shellExplosion {
-  animation: explosionAnimation 1s 100;
+  animation: shellExplosionAnimation 1s 100;
+  /* background-image: url(./901177/Effects/Flame_A.png); */
+  background-size: contain;
+}
+
+.tankExplosion {
+  animation: tankExplosionAnimation 1s 100;
   /* background-image: url(./901177/Effects/Flame_A.png); */
   background-size: contain;
 }
 
 
-@keyframes explosionAnimation {
+@keyframes shellExplosionAnimation {
   0% { 
     background-image: url(./901177/Effects/Flash_A_01.png);
   }
@@ -60,6 +66,34 @@ div{
   100% {
     background-image: url(./901177/Effects/Flash_A_05.png);
   }
+}
+
+@keyframes tankExplosionAnimation {
+  0% { 
+    background-image: url(./901177/Effects/Explosion_A.png);
+  }
+  14% { 
+    background-image: url(./901177/Effects/Explosion_B.png);
+  }
+  28% { 
+    background-image: url(./901177/Effects/Explosion_C.png);
+  }
+  42% { 
+    background-image: url(./901177/Effects/Explosion_D.png);
+  }
+  57% {
+    background-image: url(./901177/Effects/Explosion_E.png);
+  }
+  71% {
+    background-image: url(./901177/Effects/Explosion_F.png);
+  }
+  86% {
+    background-image: url(./901177/Effects/Explosion_G.png);
+  }
+  100% {
+    background-image: url(./901177/Effects/Explosion_H.png);
+  }
+
 }
 
 .cellTank{

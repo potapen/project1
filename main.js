@@ -214,7 +214,9 @@ class Trooper{
             isTargetDead = target.takeDamage(this.strength)//compute damage on the target ennemy
         }
         this.addShellExplosionEffect(index)
-        if(isTargetDead){console.log('targetisdead')}
+        if(isTargetDead){
+            this.addTankExplosionEffect(index)
+        }
     }
 
     takeDamage(damage){
@@ -222,7 +224,24 @@ class Trooper{
         const isTargetDead = this.health <= 0 ? true : false
         return isTargetDead
     }
-    // we add explosion effect, then remove it after 1 second. Otherwise the grid is polluted with old explosion class.
+
+    //we set delay before add the class so that the tank explodes after the shell explodes
+    addTankExplosionEffect(index){
+        console.log('addTankExplosionEffect function')
+        const cellEffectElt = cellsArray[index].querySelector('.cellEffect')
+
+        setTimeout(() => {
+            cellEffectElt.classList.add('tankExplosion')
+        }
+            , 2000)
+        setTimeout(() => {
+            cellEffectElt.classList.remove('tankExplosion')
+        }
+            , 3000)
+        
+    }
+
+    // we add shellexplosion effect, then remove it after 1 second. Otherwise the grid is polluted with old explosion class.
     addShellExplosionEffect(index){
         console.log('addExplosionEffect function')
         const cellEffectElt = cellsArray[index].querySelector('.cellEffect')
