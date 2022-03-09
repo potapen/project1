@@ -359,6 +359,7 @@ const game = {
         if(this.armies['blue'].length === 0 && this.armies['red'].length === 0){ //the last unit probably shot itself
             console.log('it is a tie')
             document.removeEventListener('click', game.handleClick.bind(game))
+            gridElt.removeEventListener('mousemove',  game.handleMouse.bind(game))
         }
         else if(armySize === 0){ //all troopers are gone, the game is finished
             console.log(`game over, ${previousArmy} won`)
@@ -408,6 +409,44 @@ const game = {
                     break
             }
         }
+    },
+    handleMouse(e){
+        //offset are probably created from other element like the title.
+        const offsetX = 0
+        const offsetY = 80
+    
+        const selectedUnit = this.selectedUnit
+        if(selectedUnit){ //at the end of the game there is no tank left, so selectedUnit returns undefined
+            //compute coordinate(X,Y) of the selected tank. X is the coordinate from left to right. Y is the coordinate from top to bottom
+            //selectedUnit.x is the line position of the tank in the cellsArray, so it is from top to bottom
+            //selectedUnit.y is the column position of the tank in the cellsArray, so it is from left to rigth
+            const X = cellWidth/2 + (selectedUnit.y -1)*cellWidth + offsetX
+            const Y = cellHeight/2 + (selectedUnit.x -1)*cellHeight + offsetY
+            const angle = computeAngle(X,Y,e.clientX,e.clientY)
+            const index = selectedUnit.getIndex()
+            const container = cellsArray[index]
+            const turretElt = container.querySelector('.cellTurret')
+            turretElt.style.setProperty('--turretAngle', angle + "deg")//we add style in the DOM. We do not update the css which is static.
+            /*
+            <div class="cellTurret blueTrooper1 blue" style="--turretAngle: 150deg;"></div>
+            */
+        }
+    
+    
+    
+        //second part is to update the targetPanel with info from the tank under the mouse
+        targetPanelElt.querySelector('.coordinate').innerText = `${e.clientX}:${e.clientY}`
+        const target = event.target
+        const parentNode = target.parentNode
+        const cellTank = parentNode.querySelector('.cellTank')
+        const classArray = cellTank.classList //<div class="cellTank blueTrooper1 blue"></div>
+        if(classArray.length>1){ //this means the target element contains a tank, otherwise it would just contain <div class="cellTank"></div>
+            const targetIndex = target.id
+            const targetTank = selectedUnit.checkWhoIsInThisCell(targetIndex)//we can call the checkWhoIsInThisCell from any tank, it does not matter
+            if(targetTank){ //in case the tank has been destroyed, we don't want to get lot of undefined errors
+                targetTank.displayInfoPanel(targetPanelElt)
+            }
+        }
     }
 }
 function computeAngle(x1,y1,x2,y2){ //function to compute turret angle using al kashi
@@ -434,44 +473,6 @@ another listener used for:
 -animating the turret rotation
 -updating in real time the target info panel
 */
-gridElt.addEventListener("mousemove", e => {
-    //offset are probably created from other element like the title.
-    const offsetX = 0
-    const offsetY = 80
-
-    const selectedUnit = game.selectedUnit
-    if(selectedUnit){ //at the end of the game there is no tank left, so selectedUnit returns undefined
-        //compute coordinate(X,Y) of the selected tank. X is the coordinate from left to right. Y is the coordinate from top to bottom
-        //selectedUnit.x is the line position of the tank in the cellsArray, so it is from top to bottom
-        //selectedUnit.y is the column position of the tank in the cellsArray, so it is from left to rigth
-        const X = cellWidth/2 + (selectedUnit.y -1)*cellWidth + offsetX
-        const Y = cellHeight/2 + (selectedUnit.x -1)*cellHeight + offsetY
-        const angle = computeAngle(X,Y,e.clientX,e.clientY)
-        const index = selectedUnit.getIndex()
-        const container = cellsArray[index]
-        const turretElt = container.querySelector('.cellTurret')
-        turretElt.style.setProperty('--turretAngle', angle + "deg")//we add style in the DOM. We do not update the css which is static.
-        /*
-        <div class="cellTurret blueTrooper1 blue" style="--turretAngle: 150deg;"></div>
-        */
-    }
-
-
-
-    //second part is to update the targetPanel with info from the tank under the mouse
-    targetPanelElt.querySelector('.coordinate').innerText = `${e.clientX}:${e.clientY}`
-    const target = event.target
-    const parentNode = target.parentNode
-    const cellTank = parentNode.querySelector('.cellTank')
-    const classArray = cellTank.classList //<div class="cellTank blueTrooper1 blue"></div>
-    if(classArray.length>1){ //this means the target element contains a tank, otherwise it would just contain <div class="cellTank"></div>
-        const targetIndex = target.id
-        const targetTank = selectedUnit.checkWhoIsInThisCell(targetIndex)//we can call the checkWhoIsInThisCell from any tank, it does not matter
-        if(targetTank){ //in case the tank has been destroyed, we don't want to get lot of undefined errors
-            targetTank.displayInfoPanel(targetPanelElt)
-        }
-    }
-    
-
-});
+gridElt.addEventListener('mousemove', game.handleMouse.bind(game))
+gridElt.removeEventListener('mousemove', game.handleMouse.bind(game))
 console.log('fin')
