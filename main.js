@@ -323,6 +323,8 @@ class Game{
         })
     }
     selectNextUnit(){ //select the next trooper to play for a given army (blue or red).
+        console.log('selectNextUnit function')
+        console.log('this:', this)
         const previousArmy = this.currentArmy
         this.currentArmy = this.currentArmy === 'blue' ? 'red' : 'blue'
         console.log('selectNextUnit function')
@@ -331,12 +333,13 @@ class Game{
         const armySize = this.armies[this.currentArmy].length //size of army, int
         if(this.armies['blue'].length === 0 && this.armies['red'].length === 0){ //the last unit probably shot itself
             console.log('it is a tie')
-            document.removeEventListener('click', this.handleClick)
-            gridElt.removeEventListener('mousemove', this.handleMouse)
+            this.currentPhase = 'gameOver'
+            return false
         }
         else if(armySize === 0){ //all troopers are gone, the game is finished
             console.log(`game over, ${previousArmy} won`)
             this.currentPhase = 'gameOver'
+            return false
 
         }else{
             /* 
@@ -350,6 +353,7 @@ class Game{
             this.selectedUnit.showNextMoveCells()
             
             this.selectedUnit.displayInfoPanel(attackerPanelElt) //once the unit is selected we can show its info on the attacker's panel
+            return true
         }
 
 
@@ -361,6 +365,7 @@ class Game{
         console.log('handleClick event: ',event)
         if(event.target.classList.contains('cell')){ //we click on a cell of the grid
             const index = Number(event.target.id) //this is the index of the cell on which we click
+            console.log('this.currentPhase: ', this.currentPhase)
             switch(this.currentPhase){
                 case 'move':
                     console.log('switch case move')
@@ -374,11 +379,13 @@ class Game{
                     console.log('switch case fire')
                     this.selectedUnit.fire(index)
                     this.selectedUnit.removeNextFireCells()
-                    this.selectNextUnit()
-                    this.currentPhase = 'move'
+                    let continueToPlay = this.selectNextUnit()
+                    this.currentPhase = continueToPlay? 'move' : 'gameOver'
                     break
                 case 'gameOver':
-                    this.selectNextUnit()
+                    console.log('removing all controls')
+                    document.removeEventListener('click', this.handleClick)
+                    gridElt.removeEventListener('mousemove', this.handleMouse)
                     break
             }
         }
