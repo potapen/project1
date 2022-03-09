@@ -11,8 +11,8 @@ document.documentElement.style.getPropertyValue('--cellWidth') returns something
 It returns undefined if it has been set through CSS
  you have to make use of the getComputedStyle()method , before calling .getPropertyValue()
  */
-const cellWidth = getComputedStyle(document.documentElement,null).getPropertyValue('--cellWidth') //the width of each cell, the value is set in style.css with a custom property --cellWidth
-const cellHeight = getComputedStyle(document.documentElement,null).getPropertyValue('--cellHeight')
+const cellWidth = parseFloat(getComputedStyle(document.documentElement,null).getPropertyValue('--cellWidth')) //the width of each cell, the value is set in style.css with a custom property --cellWidth
+const cellHeight = parseFloat(getComputedStyle(document.documentElement,null).getPropertyValue('--cellHeight')) //parseFloat('80px') returns 80
 
 
 /*------------------------------------------------------------------------------------------------
@@ -385,18 +385,25 @@ another listener used for:
 -updating in real time the target info panel
 */
 gridElt.addEventListener("mousemove", e => {
+    //offset are probably created from other element like the title.
     const offsetX = 0
     const offsetY = 80
-    // console.log('addEventListener("mousemove") event', event)
+
     const selectedUnit = game.selectedUnit
+    //compute coordinate(X,Y) of the selected tank. X is the coordinate from left to right. Y is the coordinate from top to bottom
+    //selectedUnit.x is the line position of the tank in the cellsArray, so it is from top to bottom
+    //selectedUnit.y is the column position of the tank in the cellsArray, so it is from left to rigth
     const X = cellWidth/2 + (selectedUnit.y -1)*cellWidth + offsetX
     const Y = cellHeight/2 + (selectedUnit.x -1)*cellHeight + offsetY
     const angle = computeAngle(X,Y,e.clientX,e.clientY)
-
     const index = selectedUnit.getIndex()
     const container = cellsArray[index]
     const turretElt = container.querySelector('.cellTurret')
-    turretElt.style.setProperty('--turretAngle', angle + "deg")
+    turretElt.style.setProperty('--turretAngle', angle + "deg")//we add style in the DOM. We do not update the css which is static.
+    /*
+    <div class="cellTurret blueTrooper1 blue" style="--turretAngle: 150deg;"></div>
+    */
+
     targetPanelElt.querySelector('.coordinate').innerText = `${e.clientX}:${e.clientY}`
 
     const target = event.target
