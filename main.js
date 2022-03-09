@@ -209,23 +209,27 @@ class Trooper{
     fire = (index)=>{ //I am using an arrow function here so that 'this' can still refers to the trooper object, instead of the cell
         console.log('fire function')
         const target = this.checkWhoIsInThisCell(index)
+        let isTargetDead = false
         if (target){ //if there is a target tank where we shoot
-            target.takeDamage(this.strength)//compute damage on the target ennemy
+            isTargetDead = target.takeDamage(this.strength)//compute damage on the target ennemy
         }
-        this.addExplosionEffect(index)
-
+        this.addShellExplosionEffect(index)
+        if(isTargetDead){console.log('targetisdead')}
     }
 
     takeDamage(damage){
         this.health -= damage
+        const isTargetDead = this.health <= 0 ? true : false
+        return isTargetDead
     }
     // we add explosion effect, then remove it after 1 second. Otherwise the grid is polluted with old explosion class.
-    addExplosionEffect(index){
+    addShellExplosionEffect(index){
         console.log('addExplosionEffect function')
-        const cellEffectElt = cellsArray[index].querySelector('.cellEffect') 
-        cellEffectElt.classList.add('explosion')
+        const cellEffectElt = cellsArray[index].querySelector('.cellEffect')
+        console.log('cellEffectElt: ', cellEffectElt)
+        cellEffectElt.classList.add('shellExplosion')
         setTimeout(() => {
-            cellEffectElt.remove('explosion')
+            cellEffectElt.classList.remove('shellExplosion')
         }
             , 1000)
         
@@ -264,7 +268,7 @@ const game = {
         const blueTrooper2 = new Trooper(5,2,'blue','blueTrooper2',1,2,100,20)
         this.blueTroopersArray.push(blueTrooper1)
         this.blueTroopersArray.push(blueTrooper2)
-        const redTrooper1 = new Trooper(3,9,'red','redTrooper1',1,2,110,15)
+        const redTrooper1 = new Trooper(3,9,'red','redTrooper1',1,2,10,15)
         const redTrooper2 = new Trooper(5,9,'red','redTrooper2',1,2,110,15)
         this.redTroopersArray.push(redTrooper1)
         this.redTroopersArray.push(redTrooper2)
@@ -337,11 +341,6 @@ const game = {
         if(event.target.classList.contains('cell')){ //we click on a cell of the grid
             const index = Number(event.target.id) //this is the index of the cell on which we click
             switch(game.currentPhase){
-                // case 'selectMovable':
-                //     console.log('switch case selectMovable')
-                //     this.selectedUnit.computeNextMoveCells()
-                //     this.selectedUnit.showNextMoveCells()
-                //     game.currentPhase = 'move'
                 case 'move':
                     console.log('switch case move')
                     this.selectedUnit.removeNextMoveCells()
@@ -375,7 +374,7 @@ function computeAngle(x1,y1,x2,y2){ //function to compute turret angle using al 
 }
 
 /*------------------------------------------------------------------------------------------------
-script
+main
 --------------------------------------------------------------------------------------------------
 */
 game.initGame()
@@ -407,9 +406,8 @@ gridElt.addEventListener("mousemove", e => {
     */
 
 
-
+    //second part is to update the targetPanel with info from the tank under the mouse
     targetPanelElt.querySelector('.coordinate').innerText = `${e.clientX}:${e.clientY}`
-
     const target = event.target
     const parentNode = target.parentNode
     const cellTank = parentNode.querySelector('.cellTank')

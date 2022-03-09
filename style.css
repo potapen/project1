@@ -37,7 +37,7 @@ div{
 }
 
 
-.explosion {
+.shellExplosion {
   animation: explosionAnimation 1s 100;
   /* background-image: url(./901177/Effects/Flame_A.png); */
   background-size: contain;
