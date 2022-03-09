@@ -231,8 +231,9 @@ class Trooper{
         
     }
 
-    displayInfoPanel(){ //populate a panel (either attacker or target) with info from a tank
-        const ulElt = attackerPanelElt.querySelector('ul')
+    displayInfoPanel(element){ //populate a panel (either attacker or target) with info from a tank
+
+        const ulElt = element.querySelector('ul')
         ulElt.querySelector('.x').innerText = `x: ${this.x}`
         ulElt.querySelector('.y').innerText = `y: ${this.y}`
         ulElt.querySelector('.army').innerText = `army: ${this.army}`
@@ -323,7 +324,8 @@ const game = {
 
         this.selectedUnit.computeNextMoveCells()
         this.selectedUnit.showNextMoveCells()
-        this.selectedUnit.displayInfoPanel() //once the unit is selected we can show its info on the attacker's panel
+        
+        this.selectedUnit.displayInfoPanel(attackerPanelElt) //once the unit is selected we can show its info on the attacker's panel
 
     },
 
@@ -404,16 +406,20 @@ gridElt.addEventListener("mousemove", e => {
     <div class="cellTurret blueTrooper1 blue" style="--turretAngle: 150deg;"></div>
     */
 
+
+
     targetPanelElt.querySelector('.coordinate').innerText = `${e.clientX}:${e.clientY}`
 
     const target = event.target
     const parentNode = target.parentNode
     const cellTank = parentNode.querySelector('.cellTank')
-    const classArray = cellTank.classList
-    if(classArray.length>1){
-        console.log('classArray:', classArray)
+    const classArray = cellTank.classList //<div class="cellTank blueTrooper1 blue"></div>
+    if(classArray.length>1){ //this means the target element contains a tank, otherwise it would just contain <div class="cellTank"></div>
+        const targetIndex = target.id
+        const targetTank = selectedUnit.checkWhoIsInThisCell(targetIndex) //we can call the checkWhoIsInThisCell from any tank, it does not matter
+        targetTank.displayInfoPanel(targetPanelElt)
     }
-
+    
 
 });
 console.log('fin')
