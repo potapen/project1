@@ -215,8 +215,22 @@ class Trooper{
         }
         this.addShellExplosionEffect(index)
         if(isTargetDead){
-            this.addTankExplosionEffect(index)
+            const deadTrooper = this.handleDeadTrooper(index)
+            this.addTankExplosionEffect(index, deadTrooper)
         }
+        return isTargetDead
+    }
+
+    handleDeadTrooper(index){
+        console.log('handleDeadTrooper function')
+        const deadTrooper = this.checkWhoIsInThisCell(index)
+        //deadTrooper.removeFromMap()
+        console.log('deadTrooper :', deadTrooper)
+        const army = deadTrooper.army
+        const removeIndex = game.armies[army].indexOf(deadTrooper)
+        game.armies[army].splice(removeIndex,1)
+        return deadTrooper
+        
     }
 
     takeDamage(damage){
@@ -226,7 +240,7 @@ class Trooper{
     }
 
     //we set delay before add the class so that the tank explodes after the shell explodes
-    addTankExplosionEffect(index){
+    addTankExplosionEffect(index, deadTrooper){
         console.log('addTankExplosionEffect function')
         const cellEffectElt = cellsArray[index].querySelector('.cellEffect')
 
@@ -236,6 +250,7 @@ class Trooper{
             , 2000)
         setTimeout(() => {
             cellEffectElt.classList.remove('tankExplosion')
+            deadTrooper.removeFromMap()
         }
             , 3000)
         
@@ -255,7 +270,6 @@ class Trooper{
     }
 
     displayInfoPanel(element){ //populate a panel (either attacker or target) with info from a tank
-
         const ulElt = element.querySelector('ul')
         ulElt.querySelector('.x').innerText = `x: ${this.x}`
         ulElt.querySelector('.y').innerText = `y: ${this.y}`
@@ -283,12 +297,12 @@ const game = {
     currentPhase : '', //move or fire
     initGame(){
         //populate the blueTroopersArray and redTroopersArray
-        const blueTrooper1 = new Trooper(3,2,'blue','blueTrooper1',1,2,100,20)
-        const blueTrooper2 = new Trooper(5,2,'blue','blueTrooper2',1,2,100,20)
+        const blueTrooper1 = new Trooper(3,2,'blue','blueTrooper1',1,2,12,20)
+        const blueTrooper2 = new Trooper(5,2,'blue','blueTrooper2',1,2,12,20)
         this.blueTroopersArray.push(blueTrooper1)
         this.blueTroopersArray.push(blueTrooper2)
         const redTrooper1 = new Trooper(3,9,'red','redTrooper1',1,2,10,15)
-        const redTrooper2 = new Trooper(5,9,'red','redTrooper2',1,2,110,15)
+        const redTrooper2 = new Trooper(5,9,'red','redTrooper2',1,2,10,15)
         this.redTroopersArray.push(redTrooper1)
         this.redTroopersArray.push(redTrooper2)
         this.armies['blue'] = this.blueTroopersArray
@@ -351,7 +365,6 @@ const game = {
         this.selectedUnit.displayInfoPanel(attackerPanelElt) //once the unit is selected we can show its info on the attacker's panel
 
     },
-
     /*
     we handle the state machine of the game here. The game has 2 phases: move and fire.
     */
@@ -377,7 +390,6 @@ const game = {
                     break
             }
         }
-
     }
 }
 function computeAngle(x1,y1,x2,y2){ //function to compute turret angle using al kashi
@@ -410,19 +422,22 @@ gridElt.addEventListener("mousemove", e => {
     const offsetY = 80
 
     const selectedUnit = game.selectedUnit
-    //compute coordinate(X,Y) of the selected tank. X is the coordinate from left to right. Y is the coordinate from top to bottom
-    //selectedUnit.x is the line position of the tank in the cellsArray, so it is from top to bottom
-    //selectedUnit.y is the column position of the tank in the cellsArray, so it is from left to rigth
-    const X = cellWidth/2 + (selectedUnit.y -1)*cellWidth + offsetX
-    const Y = cellHeight/2 + (selectedUnit.x -1)*cellHeight + offsetY
-    const angle = computeAngle(X,Y,e.clientX,e.clientY)
-    const index = selectedUnit.getIndex()
-    const container = cellsArray[index]
-    const turretElt = container.querySelector('.cellTurret')
-    turretElt.style.setProperty('--turretAngle', angle + "deg")//we add style in the DOM. We do not update the css which is static.
-    /*
-    <div class="cellTurret blueTrooper1 blue" style="--turretAngle: 150deg;"></div>
-    */
+    if(selectedUnit){ //at the end of the game there is no tank left, so selectedUnit returns undefined
+        //compute coordinate(X,Y) of the selected tank. X is the coordinate from left to right. Y is the coordinate from top to bottom
+        //selectedUnit.x is the line position of the tank in the cellsArray, so it is from top to bottom
+        //selectedUnit.y is the column position of the tank in the cellsArray, so it is from left to rigth
+        const X = cellWidth/2 + (selectedUnit.y -1)*cellWidth + offsetX
+        const Y = cellHeight/2 + (selectedUnit.x -1)*cellHeight + offsetY
+        const angle = computeAngle(X,Y,e.clientX,e.clientY)
+        const index = selectedUnit.getIndex()
+        const container = cellsArray[index]
+        const turretElt = container.querySelector('.cellTurret')
+        turretElt.style.setProperty('--turretAngle', angle + "deg")//we add style in the DOM. We do not update the css which is static.
+        /*
+        <div class="cellTurret blueTrooper1 blue" style="--turretAngle: 150deg;"></div>
+        */
+    }
+
 
 
     //second part is to update the targetPanel with info from the tank under the mouse
@@ -433,8 +448,10 @@ gridElt.addEventListener("mousemove", e => {
     const classArray = cellTank.classList //<div class="cellTank blueTrooper1 blue"></div>
     if(classArray.length>1){ //this means the target element contains a tank, otherwise it would just contain <div class="cellTank"></div>
         const targetIndex = target.id
-        const targetTank = selectedUnit.checkWhoIsInThisCell(targetIndex) //we can call the checkWhoIsInThisCell from any tank, it does not matter
-        targetTank.displayInfoPanel(targetPanelElt)
+        const targetTank = selectedUnit.checkWhoIsInThisCell(targetIndex)//we can call the checkWhoIsInThisCell from any tank, it does not matter
+        if(targetTank){ //in case the tank has been destroyed, we don't want to get lot of undefined errors
+            targetTank.displayInfoPanel(targetPanelElt)
+        }
     }
     
 
