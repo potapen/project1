@@ -54,7 +54,8 @@ function createContainerCell(i) {
     createCell('div','cellTile',containerCell)
     createCell('div','cellHighlight',containerCell)//to display cell highlighting, ex: to show where to move or attack
     createCell('div','cellTank',containerCell) //to show the body of the tank
-    createCell('div','cellTurret',containerCell) //to show the turret, so it can rotate independantly from the body
+    const cellTurretElt = createCell('div','cellTurret',containerCell) //to show the turret, so it can rotate independantly from the body
+    createCell('div','cellFlame',cellTurretElt)
     createCell('div','cellEffect',containerCell)//to display explosion
     const cell = createCell('div','cell',containerCell)
     cell.id = i //i is the index of the container in cellsArray
@@ -358,8 +359,8 @@ const game = {
         const armySize = this.armies[this.currentArmy].length //size of army, int
         if(this.armies['blue'].length === 0 && this.armies['red'].length === 0){ //the last unit probably shot itself
             console.log('it is a tie')
-            document.removeEventListener('click', game.handleClick.bind(game))
-            gridElt.removeEventListener('mousemove',  game.handleMouse.bind(game))
+            document.removeEventListener('click', clickCallback)
+            gridElt.removeEventListener('mousemove', moveCallback)
         }
         else if(armySize === 0){ //all troopers are gone, the game is finished
             console.log(`game over, ${previousArmy} won`)
@@ -439,14 +440,17 @@ const game = {
         const target = event.target
         const parentNode = target.parentNode
         const cellTank = parentNode.querySelector('.cellTank')
-        const classArray = cellTank.classList //<div class="cellTank blueTrooper1 blue"></div>
-        if(classArray.length>1){ //this means the target element contains a tank, otherwise it would just contain <div class="cellTank"></div>
-            const targetIndex = target.id
-            const targetTank = selectedUnit.checkWhoIsInThisCell(targetIndex)//we can call the checkWhoIsInThisCell from any tank, it does not matter
-            if(targetTank){ //in case the tank has been destroyed, we don't want to get lot of undefined errors
-                targetTank.displayInfoPanel(targetPanelElt)
+        if(cellTank){ //check if we selected a valid cell
+            const classArray = cellTank.classList //<div class="cellTank blueTrooper1 blue"></div>
+            if(classArray.length>1){ //this means the target element contains a tank, otherwise it would just contain <div class="cellTank"></div>
+                const targetIndex = target.id
+                const targetTank = selectedUnit.checkWhoIsInThisCell(targetIndex)//we can call the checkWhoIsInThisCell from any tank, it does not matter
+                if(targetTank){ //in case the tank has been destroyed, we don't want to get lot of undefined errors
+                    targetTank.displayInfoPanel(targetPanelElt)
+                }
             }
         }
+
     }
 }
 function computeAngle(x1,y1,x2,y2){ //function to compute turret angle using al kashi
@@ -466,13 +470,21 @@ main
 --------------------------------------------------------------------------------------------------
 */
 game.initGame()
-document.addEventListener('click', game.handleClick.bind(game))
+
+const clickCallback = game.handleClick.bind(game)
+document.addEventListener('click', clickCallback)
 
 /*
 another listener used for:
 -animating the turret rotation
 -updating in real time the target info panel
 */
-gridElt.addEventListener('mousemove', game.handleMouse.bind(game))
-gridElt.removeEventListener('mousemove', game.handleMouse.bind(game))
-console.log('fin')
+
+//A new function reference is created after .bind() is called. So, to add or remove it, assign the reference to a variable
+const moveCallback = game.handleMouse.bind(game)
+gridElt.addEventListener('mousemove', moveCallback)
+
+
+// const display = (e) => {console.log(e)}
+// gridElt.addEventListener('mousemove', display)
+// gridElt.removeEventListener('mousemove', display)

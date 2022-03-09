@@ -36,16 +36,27 @@ div{
   background-size: contain;
 }
 
+.cellFlame{
+  border: 1px solid red;
+  width: 100%;
+  height: 100%;
+  background-size: contain;
+  background-position-x:right;
+}
+
 
 .shellExplosion {
-  animation: shellExplosionAnimation 1s 100;
-  /* background-image: url(./901177/Effects/Flame_A.png); */
+  animation: shellExplosionAnimation 1s 1;
   background-size: contain;
 }
 
 .tankExplosion {
-  animation: tankExplosionAnimation 1s 100;
-  /* background-image: url(./901177/Effects/Flame_A.png); */
+  animation: tankExplosionAnimation 1s 1;
+  background-size: contain;
+}
+
+.flame {
+  animation: flameAnimation 1s 1;
   background-size: contain;
 }
 
@@ -93,9 +104,34 @@ div{
   100% {
     background-image: url(./901177/Effects/Explosion_H.png);
   }
-
 }
 
+@keyframes flameAnimation {
+  0% { 
+    background-image: url(./901177/Effects/Flame_A.png);
+  }
+  14% { 
+    background-image: url(./901177/Effects/Flame_B.png);
+  }
+  28% { 
+    background-image: url(./901177/Effects/Flame_C.png);
+  }
+  42% { 
+    background-image: url(./901177/Effects/Flame_D.png);
+  }
+  57% {
+    background-image: url(./901177/Effects/Flame_E.png);
+  }
+  71% {
+    background-image: url(./901177/Effects/Flame_F.png);
+  }
+  86% {
+    background-image: url(./901177/Effects/Flame_G.png);
+  }
+  100% {
+    background-image: url(./901177/Effects/Flame_H.png);
+  }
+}
 .cellTank{
   background-image: var(--tankImageUrl);
 }
