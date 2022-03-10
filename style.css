@@ -1,6 +1,5 @@
 * {
   box-sizing: border-box;
-  border:red 1px solid; 
 }
 
 
@@ -15,8 +14,18 @@ body{
   background-image: url(./others/Camo.jpg);
   /* justify-content: space-between; */
 }
+
+h2{
+  padding-left: 40px;
+}
+.black{
+  color: black;
+}
+
+ul{
+  list-style-type: none;
+}
 #rightSection{
-  border: yellow 2px solid;
   flex-grow: 1;
   display: flex;
   flex-direction: column;
@@ -33,14 +42,34 @@ body{
 }
 
 .messagePanel{
-  border:blue 5px solid;
   flex-grow: 1;
   background-image: url(./others/Board.gif);
   background-repeat: no-repeat;
   background-position: 0% 60%;
   z-index: -1;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  
 }
 
+.attackerPanel{
+  background-image: url(./others/Display.png);
+  background-repeat: no-repeat;
+  background-size: contain;
+  color: rgb(7, 197, 7);
+  border: yellow 2px solid;
+  width: 45%;
+}
+
+.targetPanel{
+  background-image: url(./others/Display.png);
+  background-repeat: no-repeat;
+  background-size: contain;
+  color: white;
+  color: rgb(7, 197, 7);
+  width: 45%;
+}
 .grid {
     display: flex;
     height: 720px;
@@ -284,4 +313,8 @@ body{
 .edgeRight{
   background-image: url(./566611/Hedges/Hedge_A_02.png);
   transform: rotate(90deg);
+}
+
+.hide{
+  display: none;
 }
