@@ -62,7 +62,7 @@ function createContainerCell(i) {
     cell.id = i //i is the index of the container in cellsArray
     const x = convertIndexToCoordinate(i).x
     const y = convertIndexToCoordinate(i).y
-    // cell.innerText = `${i} (${x}:${y})` //for debugging purpose
+    cell.innerText = `${i} (${x}:${y})` //for debugging purpose
     return containerCell
 }
 
@@ -111,6 +111,20 @@ for(let i=1 ; i < gridHeight -1; i++){
 for(let i=1 ; i < gridHeight -1; i++){
     j = i*10 + gridWidth -1
     document.getElementById(j).parentNode.querySelector('.cellProp').classList.add('edgeRight')
+}
+
+for(let y=2 ; y < gridWidth; y++){
+    for(let x=2 ; x < gridHeight; x++){
+        index = convertCoordinateToIndex(x,y)
+        console.log(x,y,index)
+        const randomPropNumber = Math.floor(Math.random()*10)
+        const randomNumber = Math.floor(Math.random()*10)
+        if(randomNumber>7){
+            const classToAdd = `prop${randomPropNumber}`
+            console.log(classToAdd)
+            document.getElementById(index).parentNode.querySelector('.cellProp').classList.add(classToAdd)
+        }
+    }
 }
 
 /*------------------------------------------------------------------------------------------------
