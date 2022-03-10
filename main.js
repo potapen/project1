@@ -312,7 +312,7 @@ class Trooper{
                 else{messageBoardElt.innerText = 'nice shot!'}
                 isTargetDead = target.takeDamage(this.strength)//compute damage on the target ennemy
             }
-            else{messageBoardElt.innerText = 'How about shooting some damn ennemies!'}
+            else{messageBoardElt.innerText = 'How about shooting some damn enemies!'}
             this.addShellExplosionEffect(index)
             if(isTargetDead){
                 const deadTrooper = this.handleDeadTrooper(index)
