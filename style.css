@@ -213,3 +213,11 @@ div{
   height: 100%;
   border: black 5px solid;
 }
+
+.tile_01_A{
+  background-image: url(./566611/Tiles/Ground_Tile_01_A.png);
+}
+
+.tile_02_A{
+  background-image: url(./566611/Tiles/Ground_Tile_02_A.png);
+}

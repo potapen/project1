@@ -71,6 +71,16 @@ function createCell(cellType='div', cellClass,eltToAppendTo){ //create a cell wi
     eltToAppendTo.appendChild(cell)
     return cell
 }
+
+
+/*------------------------------------------------------------------------------------------------
+add tiles
+--------------------------------------------------------------------------------------------------
+*/
+const normalTiles = document.querySelectorAll('.cellTile')
+normalTiles.forEach(tile => tile.classList.add('tile_01_A') )
+
+
 /*------------------------------------------------------------------------------------------------
 trooper class
 --------------------------------------------------------------------------------------------------
