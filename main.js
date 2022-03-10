@@ -263,6 +263,7 @@ class Trooper{
         }
         else{
             messageBoardElt.innerText = 'one step at time son! you can only move within the blue cells'
+            document.getElementById('soundSifflet').play()
         }
         return allowedMove
     }
@@ -285,12 +286,19 @@ class Trooper{
                 const targetName =  target.name
                 const shooterArmy = myGame.selectedUnit.army
                 const shooterName = myGame.selectedUnit.name
-                if(targetName === shooterName){messageBoardElt.innerText = 'Dude... you shot yourself...'}
+                if(targetName === shooterName){
+                    messageBoardElt.innerText = 'Dude... you shot yourself...'
+                    setTimeout(() => {
+                        document.getElementById('soundFailure').play()
+                    }
+                        , 1000)
+
+                }
                 else if(targetArmy === shooterArmy){messageBoardElt.innerText = 'Friendly fire!'}
                 else{messageBoardElt.innerText = 'nice shot!'}
                 isTargetDead = target.takeDamage(this.strength)//compute damage on the target ennemy
             }
-            else{messageBoardElt.innerText = 'What about shooting some damn ennemies!'}
+            else{messageBoardElt.innerText = 'How about shooting some damn ennemies!'}
             this.addShellExplosionEffect(index)
             if(isTargetDead){
                 const deadTrooper = this.handleDeadTrooper(index)
@@ -299,6 +307,7 @@ class Trooper{
         }
         else{
             messageBoardElt.innerText = 'you are a tank, not a sniper! fire within the orange cells'
+            document.getElementById('soundSifflet').play()
         }
         return allowedShot
 
@@ -325,10 +334,12 @@ class Trooper{
     //we set delay before add the class so that the tank explodes after the shell explodes
     addTankExplosionEffect(index, deadTrooper){
         console.log('addTankExplosionEffect function')
+
         const cellEffectElt = cellsArray[index].querySelector('.cellEffect')
 
         setTimeout(() => {
             cellEffectElt.classList.add('tankExplosion')
+            document.getElementById('soundExplosion').play()
         }
             , 2000)
         setTimeout(() => {
@@ -476,6 +487,10 @@ class Game{
                     console.log('removing all controls')
                     document.removeEventListener('click', this.handleClick)
                     gridElt.removeEventListener('mousemove', this.handleMouse)
+                    setTimeout(() => {
+                        document.getElementById('soundVictory').play()
+                    }
+                        , 2000)
                     break
             }
         }
