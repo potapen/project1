@@ -210,11 +210,11 @@
 }
 
 .tile_01{
-  background-image: url(./566611/Tiles/Ground_Tile_01_A.png);
+  background-image: url(./566611/Tiles/Ground_Tile_01_C.png);
 }
 
 .tile_02{
-  background-image: url(./566611/Tiles/Ground_Tile_02_A.png);
+  background-image: url(./566611/Tiles/Ground_Tile_02_C.png);
 }
 
 .edgeTopLeft{
@@ -243,4 +243,14 @@
 .edgeBottom{
   background-image: url(./566611/Hedges/Hedge_A_02.png);
   transform: rotate(180deg);
+}
+
+.edgeLeft{
+  background-image: url(./566611/Hedges/Hedge_A_02.png);
+  transform: rotate(270deg);
+}
+
+.edgeRight{
+  background-image: url(./566611/Hedges/Hedge_A_02.png);
+  transform: rotate(90deg);
 }

@@ -99,9 +99,18 @@ for(let i=1 ; i < gridWidth -1; i++){
 
 for(let i=1 ; i < gridWidth -1; i++){
     const j = i + gridWidth*(gridHeight-1)
-    console.log(j)
-    console.log(document.getElementById(j).parentNode.querySelector('.cellProp'))
+
     document.getElementById(j).parentNode.querySelector('.cellProp').classList.add('edgeBottom')
+}
+
+for(let i=1 ; i < gridHeight -1; i++){
+    j = i*10
+    document.getElementById(j).parentNode.querySelector('.cellProp').classList.add('edgeLeft')
+}
+
+for(let i=1 ; i < gridHeight -1; i++){
+    j = i*10 + gridWidth -1
+    document.getElementById(j).parentNode.querySelector('.cellProp').classList.add('edgeRight')
 }
 
 /*------------------------------------------------------------------------------------------------
@@ -194,7 +203,8 @@ class Trooper{
         console.log('removeNextFireCells function')
         while(this.fireCellsArray.length > 0){
             const cell = this.fireCellsArray.shift() //remove the cell from the this.reachableCellsArray
-            cell.classList.remove('highlightFire') //remove the tag from the cell
+            const cellHighlightElt = cell.querySelector('.cellHighlight')
+            cellHighlightElt.classList.remove('highlightFire') //remove the tag from the cell
         }
         const index = this.getIndex()
         //we assume that the firing phase has ended. We remove the 
@@ -210,7 +220,8 @@ class Trooper{
 
     showFireCells(){
         this.fireCellsArray.forEach( cell => {
-            cell.classList.add('highlightFire')
+            const cellHighlightElt = cell.querySelector('.cellHighlight')
+            cellHighlightElt.classList.add('highlightFire')
         })
     }
 
