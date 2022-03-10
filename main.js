@@ -52,6 +52,7 @@ we create div container for display purpose on the grid. A container contains va
 function createContainerCell(i) {
     const containerCell = createCell('div','container',gridElt)
     createCell('div','cellTile',containerCell)
+    createCell('div','cellProp',containerCell)
     createCell('div','cellHighlight',containerCell)//to display cell highlighting, ex: to show where to move or attack
     createCell('div','cellTank',containerCell) //to show the body of the tank
     const cellTurretElt = createCell('div','cellTurret',containerCell) //to show the turret, so it can rotate independantly from the body
@@ -78,8 +79,30 @@ add tiles
 --------------------------------------------------------------------------------------------------
 */
 const normalTiles = document.querySelectorAll('.cellTile')
-normalTiles.forEach(tile => tile.classList.add('tile_01_A') )
+normalTiles.forEach(tile => {
+    const random = Math.floor(Math.random()*2)
+    if(random%2===0){tile.classList.add('tile_01')}
+    else{tile.classList.add('tile_02')}
+})
 
+document.getElementById(0).parentNode.querySelector('.cellProp').classList.add('edgeTopLeft')
+document.getElementById(gridWidth - 1).parentNode.querySelector('.cellProp').classList.add('edgeTopRight')
+document.getElementById(gridWidth*(gridHeight-1)).parentNode.querySelector('.cellProp').classList.add('edgeBottomLeft')
+document.getElementById(gridWidth*gridHeight - 1).parentNode.querySelector('.cellProp').classList.add('edgeBottomRight')
+
+const propTiles = document.querySelectorAll('.cellProp')
+
+for(let i=1 ; i < gridWidth -1; i++){
+
+    document.getElementById(i).parentNode.querySelector('.cellProp').classList.add('edgeTop')
+}
+
+for(let i=1 ; i < gridWidth -1; i++){
+    const j = i + gridWidth*(gridHeight-1)
+    console.log(j)
+    console.log(document.getElementById(j).parentNode.querySelector('.cellProp'))
+    document.getElementById(j).parentNode.querySelector('.cellProp').classList.add('edgeBottom')
+}
 
 /*------------------------------------------------------------------------------------------------
 trooper class
