@@ -116,6 +116,7 @@ class Trooper{
 
     computeNextMoveCells(){ //compute the possible cells reachable by the tank according to its current coordinate (x,y) and its moving range
         const reachableCellsArray = []
+        const reachableIndexArray = []
         for( let i = this.x - this.moveRange  ; i <= this.x + this.moveRange ; i++){
             for (let j = this.y - this.moveRange ; j <= this.y + this.moveRange ; j++){
                 const index = convertCoordinateToIndex(i, j)
@@ -123,6 +124,10 @@ class Trooper{
             }
         }
         this.reachableCellsArray = reachableCellsArray
+        reachableCellsArray.forEach(cell => {
+            reachableIndexArray.push(Number(cell.lastChild.id))
+        })
+        this.reachableIndexArray = reachableIndexArray
     }
 
     computeFireCells(){ //compute the possible cells reachable by the tank according to its current coordinate (x,y) and its firing range
@@ -202,13 +207,16 @@ class Trooper{
     move = (index)=>{ //I am using an arrow function here so that 'this' can still refers to the trooper object, instead of the cell
         console.log('move function')
         //check that we can move first
-
-        this.removeFromMap() //we remove the trooper's tag from its current position
-        const coordinate = convertIndexToCoordinate(index) //we convert index to x,y
-        this.x = coordinate.x //we update the coordinate of the trooper
-        this.y = coordinate.y
-        this.showOnMap() //we show the trooper on the map
-
+        let allowedMove = false
+        if(this.reachableIndexArray.includes(index)){//the move is allowed
+            allowedMove = true
+            this.removeFromMap() //we remove the trooper's tag from its current position
+            const coordinate = convertIndexToCoordinate(index) //we convert index to x,y
+            this.x = coordinate.x //we update the coordinate of the trooper
+            this.y = coordinate.y
+            this.showOnMap() //we show the trooper on the map
+        }
+        return allowedMove
     }
 
     /*
@@ -384,17 +392,22 @@ class Game{
                 case 'move':
                     console.log('switch case move')
                     this.selectedUnit.removeNextMoveCells()
-                    this.selectedUnit.move(index)
+                    const allowedMove = this.selectedUnit.move(index) //the player clicked on a cell within the blue highlighted zone
+                    if(!allowedMove){
+                        this.selectedUnit.computeNextMoveCells()
+                        this.selectedUnit.showNextMoveCells() //show the move cells again for the next turn
+                        break
+                    }
                     this.selectedUnit.computeFireCells()
                     this.selectedUnit.showFireCells()
                     this.currentPhase = 'fire'
                     break
                 case 'fire':
                     console.log('switch case fire')
-                    let allowedShot = this.selectedUnit.fire(index)
-                    if(!allowedShot){break}
+                    const allowedShot = this.selectedUnit.fire(index)
+                    if(!allowedShot){break} //the player clicked on a cell within the red highlighted zone
                     this.selectedUnit.removeNextFireCells()
-                    let continueToPlay = this.selectNextUnit()
+                    const continueToPlay = this.selectNextUnit() //false if there is no next unit to select
                     this.currentPhase = continueToPlay ? 'move' : 'gameOver'
                     break
                 case 'gameOver':
