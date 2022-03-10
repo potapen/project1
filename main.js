@@ -62,7 +62,7 @@ function createContainerCell(i) {
     cell.id = i //i is the index of the container in cellsArray
     const x = convertIndexToCoordinate(i).x
     const y = convertIndexToCoordinate(i).y
-    cell.innerText = `${i} (${x}:${y})` //for debugging purpose
+    // cell.innerText = `${i} (${x}:${y})` //for debugging purpose
     return containerCell
 }
 
