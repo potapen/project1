@@ -486,6 +486,7 @@ class Game{
                 case 'gameOver':
                     console.log('removing all controls')
                     document.removeEventListener('click', this.handleClick)
+                    document.querySelector('#victory').classList.remove('hide')
                     gridElt.removeEventListener('mousemove', this.handleMouse)
                     setTimeout(() => {
                         document.getElementById('soundVictory').play()
@@ -572,19 +573,19 @@ game parameters
 */
 
 //populate the blueTroopersArray and redTroopersArray
-const blueTrooper1 = new Trooper(3,5,'blue','blueTrooper1',1,2,120,20)
-const blueTrooper2 = new Trooper(5,5,'blue','blueTrooper2',1,2,12,20)
+const blueTrooper1 = new Trooper(3,5,'blue','blueTrooper1',1,2,20,20)
+// const blueTrooper2 = new Trooper(5,5,'blue','blueTrooper2',1,2,12,20)
 // const blueTrooper3 = new Trooper(7,2,'blue','blueTrooper2',1,2,12,20)
 const blueTroopersArray = []
 blueTroopersArray.push(blueTrooper1)
-blueTroopersArray.push(blueTrooper2)
+// blueTroopersArray.push(blueTrooper2)
 // this.blueTroopersArray.push(blueTrooper3)
-const redTrooper1 = new Trooper(3,7,'red','redTrooper1',1,2,100,25)
-const redTrooper2 = new Trooper(5,7,'red','redTrooper2',1,2,10,15)
+const redTrooper1 = new Trooper(3,7,'red','redTrooper1',1,2,10,25)
+// const redTrooper2 = new Trooper(5,7,'red','redTrooper2',1,2,10,15)
 // const redTrooper3 = new Trooper(7,9,'red','redTrooper2',1,2,10,15)
 const redTroopersArray = []
 redTroopersArray.push(redTrooper1)
-redTroopersArray.push(redTrooper2)
+// redTroopersArray.push(redTrooper2)
 // this.redTroopersArray.push(redTrooper3)
 const armies = {}
 armies['blue'] = blueTroopersArray
