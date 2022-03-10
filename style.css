@@ -1,6 +1,6 @@
 * {
   box-sizing: border-box;
-  /* border: black 1px solid; */
+  /* border: red 1px solid; */
 }
 
 
@@ -22,6 +22,7 @@ h1{
   background-repeat: no-repeat;
   padding-top: 40px;
   padding-left: 10px;
+  height: 200px;
   width: 150px;
   
 }
@@ -52,15 +53,25 @@ ul{
 }
 
 .messagePanel{
+/* .messageBoard{ */
   flex-grow: 1;
   background-image: url(./others/Board.gif);
   background-repeat: no-repeat;
-  background-position: 0% 80%;
+  height: 100%;
+  /* background-position: 0% 80%; */
   z-index: -1;
   display: flex;
   flex-direction: row;
-  justify-content: space-around;
-  
+  /* justify-content: center; */
+  /* border: black 1px solid; */
+}
+
+.messageBoard{
+  padding-left: 8%;
+  padding-top: 5%;
+  width: 65%;
+  font-size:2rem;
+
 }
 
 .attackerPanel{
