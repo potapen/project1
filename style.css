@@ -12,26 +12,38 @@
 body{
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  background-image: url(./others/Camo.jpg);
+  /* justify-content: space-between; */
 }
 #rightSection{
   border: yellow 2px solid;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  background-image: url(./others/General.png);
+  background-size: 40%;
+  background-repeat: no-repeat;
+  background-position: 100% 100%;
 }
 .infoPanel{
-display: flex;
-flex-direction: row;
-
-justify-content: space-around;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
 }
 
 .messagePanel{
-  border:black 1px solid;
-  height: 100%;
+  border:blue 5px solid;
+  flex-grow: 1;
+  background-image: url(./others/Board.gif);
+  background-repeat: no-repeat;
+  background-position: 0% 60%;
+  z-index: -1;
 }
 
 .grid {
     display: flex;
-    height: 800px;
+    height: 720px;
     width: 800px;
     flex-wrap: wrap;
     box-sizing: content-box; 

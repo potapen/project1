@@ -3,7 +3,7 @@ const attackerPanelElt = document.querySelector('.attackerPanel')
 const targetPanelElt = document.querySelector('.targetPanel')
 
 const gridWidth = 10 //number of cells on x axis
-const gridHeight = 10 //number of cells on y axis
+const gridHeight = 9 //number of cells on y axis
 const cellsArray = [] //to hold the div after we initialize them
 
 /*
