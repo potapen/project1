@@ -1,7 +1,7 @@
 const gridElt = document.querySelector('.grid')
 const attackerPanelElt = document.querySelector('.attackerPanel')
 const targetPanelElt = document.querySelector('.targetPanel')
-
+const messageBoardElt = document.querySelector('.messageBoard')
 const gridWidth = 10 //number of cells on x axis
 const gridHeight = 9 //number of cells on y axis
 const cellsArray = [] //to hold the div after we initialize them
@@ -260,6 +260,9 @@ class Trooper{
             this.y = coordinate.y
             this.showOnMap() //we show the trooper on the map
         }
+        else{
+            messageBoardElt.innerText = 'one step at time son! you can only move within the blue cells'
+        }
         return allowedMove
     }
 
@@ -276,13 +279,24 @@ class Trooper{
             const target = this.checkWhoIsInThisCell(index)
             let isTargetDead = false
             if (target){ //if there is a target tank where we shoot
+                const targetArmy =  target.army
+                const targetName =  target.name
+                const shooterArmy = myGame.selectedUnit.army
+                const shooterName = myGame.selectedUnit.name
+                if(targetName === shooterName){messageBoardElt.innerText = 'Dude... you shot yourself...'}
+                else if(targetArmy === shooterArmy){messageBoardElt.innerText = 'Friendly fire!'}
+                else{messageBoardElt.innerText = 'nice shot!'}
                 isTargetDead = target.takeDamage(this.strength)//compute damage on the target ennemy
             }
+            else{messageBoardElt.innerText = 'What about shooting some damn ennemies!'}
             this.addShellExplosionEffect(index)
             if(isTargetDead){
                 const deadTrooper = this.handleDeadTrooper(index)
                 this.addTankExplosionEffect(index, deadTrooper)
             }
+        }
+        else{
+            messageBoardElt.innerText = 'you are a tank, not a sniper! fire within the orange cells'
         }
         return allowedShot
 
@@ -400,10 +414,12 @@ class Game{
         if(this.armies['blue'].length === 0 && this.armies['red'].length === 0){ //the last unit probably shot itself
             console.log('it is a tie')
             this.currentPhase = 'gameOver'
+            messageBoardElt.innerText = 'gameOver, it is a tie'
             return false
         }
         else if(armySize === 0){ //all troopers are gone, the game is finished
             console.log(`game over, ${previousArmy} won`)
+            messageBoardElt.innerText = `game over, ${previousArmy} won`    
             this.currentPhase = 'gameOver'
             return false
 
@@ -539,19 +555,19 @@ game parameters
 */
 
 //populate the blueTroopersArray and redTroopersArray
-const blueTrooper1 = new Trooper(3,2,'blue','blueTrooper1',1,2,12,20)
-// const blueTrooper2 = new Trooper(5,2,'blue','blueTrooper2',1,2,12,20)
+const blueTrooper1 = new Trooper(3,5,'blue','blueTrooper1',1,2,120,20)
+const blueTrooper2 = new Trooper(5,5,'blue','blueTrooper2',1,2,12,20)
 // const blueTrooper3 = new Trooper(7,2,'blue','blueTrooper2',1,2,12,20)
 const blueTroopersArray = []
 blueTroopersArray.push(blueTrooper1)
-// this.blueTroopersArray.push(blueTrooper2)
+blueTroopersArray.push(blueTrooper2)
 // this.blueTroopersArray.push(blueTrooper3)
-const redTrooper1 = new Trooper(3,9,'red','redTrooper1',1,2,10,15)
-// const redTrooper2 = new Trooper(5,9,'red','redTrooper2',1,2,10,15)
+const redTrooper1 = new Trooper(3,7,'red','redTrooper1',1,2,100,25)
+const redTrooper2 = new Trooper(5,7,'red','redTrooper2',1,2,10,15)
 // const redTrooper3 = new Trooper(7,9,'red','redTrooper2',1,2,10,15)
 const redTroopersArray = []
 redTroopersArray.push(redTrooper1)
-// this.redTroopersArray.push(redTrooper2)
+redTroopersArray.push(redTrooper2)
 // this.redTroopersArray.push(redTrooper3)
 const armies = {}
 armies['blue'] = blueTroopersArray
