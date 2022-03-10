@@ -253,6 +253,7 @@ class Trooper{
         //check that we can move first
         let allowedMove = false
         if(this.reachableIndexArray.includes(index)){//the move is allowed
+            document.getElementById('soundTankMove').play()
             allowedMove = true
             this.removeFromMap() //we remove the trooper's tag from its current position
             const coordinate = convertIndexToCoordinate(index) //we convert index to x,y
@@ -275,6 +276,7 @@ class Trooper{
         console.log('fire function')
         let allowedShot = false
         if (this.fireIndexArray.includes(index)){ //the shot is allowed
+            document.getElementById('soundShoot').play()
             allowedShot = true
             const target = this.checkWhoIsInThisCell(index)
             let isTargetDead = false
