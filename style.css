@@ -1,5 +1,6 @@
 * {
   box-sizing: border-box;
+  border:red 1px solid; 
 }
 
 
@@ -7,7 +8,27 @@
   --cellWidth: 80px;
   --cellHeight: 80px;
 }
-  
+
+body{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+#rightSection{
+  border: yellow 2px solid;
+}
+.infoPanel{
+display: flex;
+flex-direction: row;
+
+justify-content: space-around;
+}
+
+.messagePanel{
+  border:black 1px solid;
+  height: 100%;
+}
+
 .grid {
     display: flex;
     height: 800px;
@@ -130,8 +151,6 @@
 .cellTank{
   background-image: var(--tankImageUrl);
 }
-
-
 
 .blueTrooper1{
   --tankImageUrl : url(./901177/Hulls_Color_D/Hull_01.png);
