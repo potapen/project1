@@ -486,10 +486,12 @@ class Game{
                 case 'gameOver':
                     console.log('removing all controls')
                     document.removeEventListener('click', this.handleClick)
-                    document.querySelector('#victory').classList.remove('hide')
+                    document.querySelector('#victoryImage').classList.remove('hide')
                     gridElt.removeEventListener('mousemove', this.handleMouse)
                     setTimeout(() => {
+                        document.getElementById('musicBackground').pause()
                         document.getElementById('soundVictory').play()
+                        
                     }
                         , 2000)
                     break

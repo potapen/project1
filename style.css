@@ -319,18 +319,6 @@ footer{
   margin-top: 5%;
 }
 
-#victoryText{
-  position: fixed;
-  left: 10%;
-  top: 5%;
-  width: 80%;
-  height: 80%;
-  border: solid rgb(255, 255, 255) 5px;
-  z-index: 2;
-  font-size: 10rem;
-  padding-left: 20%;
-  color: white;
-}
 .tile{
   background-image: url(./566611/Tiles/Ground_Tile_01_A.png);
 }
