@@ -127,6 +127,7 @@ class Trooper{
 
     computeFireCells(){ //compute the possible cells reachable by the tank according to its current coordinate (x,y) and its firing range
         const fireCellsArray = []
+        const fireIndexArray = []
         for( let i = this.x - this.fireRange  ; i <= this.x + this.fireRange ; i++){
             for (let j = this.y - this.fireRange ; j <= this.y + this.fireRange ; j++){
                 const index = convertCoordinateToIndex(i, j)
@@ -134,8 +135,14 @@ class Trooper{
             }
         }
         this.fireCellsArray = fireCellsArray
+        fireCellsArray.forEach(cell => {
+            fireIndexArray.push(Number(cell.lastChild.id))
+        })
+        this.fireIndexArray = fireIndexArray
+
     }
     
+
     removeNextMoveCells(){ //empty the reachableCellsArray and remove all tags from cells of the grid
         console.log('removeNextMoveCells function')
         while(this.reachableCellsArray.length > 0){
@@ -194,6 +201,8 @@ class Trooper{
     */
     move = (index)=>{ //I am using an arrow function here so that 'this' can still refers to the trooper object, instead of the cell
         console.log('move function')
+        //check that we can move first
+
         this.removeFromMap() //we remove the trooper's tag from its current position
         const coordinate = convertIndexToCoordinate(index) //we convert index to x,y
         this.x = coordinate.x //we update the coordinate of the trooper
@@ -209,17 +218,22 @@ class Trooper{
     */
     fire = (index)=>{ //I am using an arrow function here so that 'this' can still refers to the trooper object, instead of the cell
         console.log('fire function')
-        const target = this.checkWhoIsInThisCell(index)
-        let isTargetDead = false
-        if (target){ //if there is a target tank where we shoot
-            isTargetDead = target.takeDamage(this.strength)//compute damage on the target ennemy
+        let allowedShot = false
+        if (this.fireIndexArray.includes(index)){ //the shot is allowed
+            allowedShot = true
+            const target = this.checkWhoIsInThisCell(index)
+            let isTargetDead = false
+            if (target){ //if there is a target tank where we shoot
+                isTargetDead = target.takeDamage(this.strength)//compute damage on the target ennemy
+            }
+            this.addShellExplosionEffect(index)
+            if(isTargetDead){
+                const deadTrooper = this.handleDeadTrooper(index)
+                this.addTankExplosionEffect(index, deadTrooper)
+            }
         }
-        this.addShellExplosionEffect(index)
-        if(isTargetDead){
-            const deadTrooper = this.handleDeadTrooper(index)
-            this.addTankExplosionEffect(index, deadTrooper)
-        }
-        return isTargetDead
+        return allowedShot
+
     }
 
     handleDeadTrooper(index){
@@ -377,10 +391,11 @@ class Game{
                     break
                 case 'fire':
                     console.log('switch case fire')
-                    this.selectedUnit.fire(index)
+                    let allowedShot = this.selectedUnit.fire(index)
+                    if(!allowedShot){break}
                     this.selectedUnit.removeNextFireCells()
                     let continueToPlay = this.selectNextUnit()
-                    this.currentPhase = continueToPlay? 'move' : 'gameOver'
+                    this.currentPhase = continueToPlay ? 'move' : 'gameOver'
                     break
                 case 'gameOver':
                     console.log('removing all controls')
